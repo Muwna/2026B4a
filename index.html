@@ -269,14 +269,14 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 /* ================= 設定區 ================= */
 // 1) 貼上 Firebase 專案設定（Firebase 主控台 → 專案設定 → 你的應用程式）。
 //    保持 null 時為「示範模式」，資料只存在目前這台裝置的瀏覽器。
-const FIREBASE_CONFIG = 
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBcewLMvNmcG4Meba25l9D61PYCTpnSV9U",
   authDomain: "b4acard.firebaseapp.com",
   projectId: "b4acard",s
   storageBucket: "b4acard.firebasestorage.app",
   messagingSenderId: "864037056235",
   appId: "1:864037056235:web:bfa8ff99e15ebad5fc98ae",
-  measurementId: "G-06JEHBTR9F";
+  measurementId: "G-06JEHBTR9F"};
 // 2) 帳號後綴：在 Firebase 建立使用者時，Email 填「帳號@這個後綴」，例如 xiaoming@b4b.local
 const ACCOUNT_DOMAIN = 'b4b.local';
 // 3) 卡圖網址。圖片載入失敗時會自動顯示屬性色卡，不影響使用。
