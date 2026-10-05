@@ -176,7 +176,9 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 .who-has tr.me td:first-child{font-weight:700}
 .plist-pick{display:grid;gap:6px;margin-bottom:14px}
 .plist-pick button{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:10px 12px;font-family:var(--round)}
-.plist-pick button[aria-current="true"]{border-color:var(--violet);background:var(--violet-soft)}
+.plist-pick button[aria-current="true"]{border-color:var(--violet);background:var(--violet-soft);box-shadow:inset 0 0 0 1px var(--violet)}
+.plist-pick button small{font-family:var(--body);color:var(--muted);margin-left:6px;font-size:12px}
+.plist-pick button.other{font-family:var(--body);font-size:14px;color:var(--muted);background:none;border-style:dashed}
 .form-row{display:flex;gap:8px;margin-top:6px}
 .form-row input{flex:1;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:16px;min-width:0}
 .hint{font-size:13px;color:var(--muted);margin:6px 0 0}
@@ -246,12 +248,13 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 <dialog id="whoDlg"><div class="dlg">
   <div class="dlg-head"><h3 id="whoTitle">登入</h3><button class="x" type="button" data-close aria-label="關閉">✕</button></div>
   <div id="loginBox">
+    <div class="plist-pick" id="acctList"></div>
     <div class="loginf">
       <input id="acct" autocomplete="username" placeholder="帳號，例如：xiaoming" autocapitalize="off">
       <input id="code" type="password" autocomplete="current-password" placeholder="驗證碼">
       <button class="btn" id="loginBtn" type="button">登入</button>
     </div>
-    <p class="hint">帳號和驗證碼由管理員提供。不登入也可以瀏覽所有人的登記。</p>
+    <p class="hint">選擇你的帳號，再輸入驗證碼。帳號和驗證碼由管理員提供；不登入也可以瀏覽所有人的登記。</p>
   </div>
   <div id="demoBox" hidden>
     <p class="hint" style="margin-top:0">示範模式不檢查驗證碼，直接選一位玩家試用。</p>
@@ -277,7 +280,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "864037056235",
   appId: "1:864037056235:web:bfa8ff99e15ebad5fc98ae",
   measurementId: "G-06JEHBTR9F"
-  };
+};
 // 2) 帳號後綴：在 Firebase 建立使用者時，Email 填「帳號@這個後綴」，例如 xiaoming@b4b.local
 const ACCOUNT_DOMAIN = 'b4b.local';
 // 3) 卡圖網址。圖片載入失敗時會自動顯示屬性色卡，不影響使用。
@@ -418,11 +421,12 @@ async function makeFirebaseStore(cfg){
         e => console.warn(e));
       onAuthStateChanged(auth, async u => {
         if (u){
-          const r=pRef(u.uid);
-          if (!(await getDoc(r)).exists()){
-            const name=(u.email||'玩家').split('@')[0].slice(0,20);
-            await setDoc(r,{name,counts:{},ever:{},createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-          }
+          const r=pRef(u.uid), acct=(u.email||'').endsWith('@'+ACCOUNT_DOMAIN) ? u.email.split('@')[0] : (u.email||'');
+          try {
+            const snap=await getDoc(r);
+            if (!snap.exists()) await setDoc(r,{name:(acct.split('@')[0]||'玩家').slice(0,20),acct,counts:{},ever:{},createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+            else if (snap.data().acct!==acct) await updateDoc(r,{acct,updatedAt:serverTimestamp()});
+          } catch(e){ console.warn(e); toast(errMsg(e)+'（請確認已發布最新的安全規則）'); }
         }
         onA(u?u.uid:null);
       });
@@ -634,7 +638,7 @@ function renderCard(){
 }
 $('#cardDlg').addEventListener('click', async e=>{
   const d=$('#cardDlg'), n=S.openCard, p=me();
-  if (e.target===d || e.target.closest('[data-close]')) { d.close(); return; }
+  if (outside(e,d) || e.target.closest('[data-close]')) { d.close(); return; }
   const my=e.target.closest('[data-my]'); if (my && p) return setMine(n, C(p,n)+Number(my.dataset.my), E(p,n));
   const g=e.target.closest('[data-give]');
   if (g && confirm(`記錄：你送 #${n} ${BYN.get(n).zh} 給 ${pname(g.dataset.give)}？`)) await giveTo(g.dataset.give,n);
@@ -765,19 +769,38 @@ function openWho(){
   $('#demoBox').hidden = !store.demo || !!p;
   $('#meBox').hidden = !p;
   if (store.demo) $('#pickList').innerHTML = all().map(o=>`<button type="button" data-pick="${esc(o.id)}">${esc(o.name)}</button>`).join('');
+  if (!p && !store.demo) renderAcctList();
   if (p) $('#renameInput').value=p.name;
   const d=$('#whoDlg'); if(!d.open) d.showModal();
 }
+let loginAcct = lsGet('b4b-acct') || '', manualAcct = false;
+function renderAcctList(){
+  const list = all().filter(o=>o.acct);
+  if (!list.length) manualAcct = true;
+  if (loginAcct && !list.some(o=>o.acct===loginAcct)) manualAcct = true;
+  $('#acctList').innerHTML = list.map(o=>`<button type="button" data-acct="${esc(o.acct)}" aria-current="${!manualAcct && o.acct===loginAcct}">${esc(o.name)}<small>${esc(o.acct)}</small></button>`).join('')
+    + (list.length ? `<button type="button" class="other" data-acct="" aria-current="${manualAcct}">使用其他帳號（第一次登入請選這個）</button>` : '');
+  $('#acct').hidden = !manualAcct;
+  if (manualAcct) $('#acct').value = loginAcct;
+  setTimeout(()=>{ (manualAcct && !$('#acct').value ? $('#acct') : $('#code')).focus(); },50);
+}
 $('#whoBtn').addEventListener('click',openWho);
+// 只有「按下」和「放開」都在對話框外面時才關閉，避免拖曳選字時誤關
+for (const d of document.querySelectorAll('dialog')) d.addEventListener('pointerdown',e=>{ d._downOut = e.target===d; });
+const outside = (e,d) => e.target===d && d._downOut;
 $('#whoDlg').addEventListener('click',e=>{
-  if (e.target===$('#whoDlg') || e.target.closest('[data-close]')) return $('#whoDlg').close();
-  const b=e.target.closest('[data-pick]'); if(b){ store.pick(b.dataset.pick); $('#whoDlg').close(); }
+  const d=$('#whoDlg');
+  if (outside(e,d) || e.target.closest('[data-close]')) return d.close();
+  const b=e.target.closest('[data-pick]'); if(b){ store.pick(b.dataset.pick); d.close(); return; }
+  const a=e.target.closest('[data-acct]');
+  if (a){ manualAcct = a.dataset.acct===''; if(!manualAcct) loginAcct=a.dataset.acct; renderAcctList(); }
 });
 async function doLogin(){
-  const acct=$('#acct').value.trim(), code=$('#code').value;
-  if (!acct||!code) return toast('請輸入帳號和驗證碼');
+  const acct=(manualAcct ? $('#acct').value : loginAcct).trim(), code=$('#code').value;
+  if (!acct) return toast('請先選擇或輸入帳號');
+  if (!code) return toast('請輸入驗證碼');
   $('#loginBtn').disabled=true;
-  try { await store.signIn(acct,code); $('#code').value=''; $('#whoDlg').close(); toast('登入成功，點卡片下方的 + 開始登記'); }
+  try { await store.signIn(acct,code); loginAcct=acct.split('@')[0]; lsSet('b4b-acct',loginAcct); $('#code').value=''; $('#whoDlg').close(); toast('登入成功，點卡片下方的 + 開始登記'); }
   catch(e){ toast(errMsg(e)); }
   $('#loginBtn').disabled=false;
 }
