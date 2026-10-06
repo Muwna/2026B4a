@@ -148,6 +148,28 @@ h2{font:400 20px/1.3 var(--round);margin:22px 0 8px}
 .lrow .tm{color:var(--muted);font-size:12px;white-space:nowrap}
 .lrow .tx{flex:1}
 .lrow.undone .tx{text-decoration:line-through;color:var(--muted)}
+.kb{font-size:11px;font-weight:700;color:#fff;border-radius:5px;padding:2px 6px;white-space:nowrap}
+.kb.gift{background:var(--ok)}.kb.trade{background:var(--violet)}
+.log-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tbadge{display:inline-block;min-width:18px;padding:1px 5px;margin-left:4px;border-radius:99px;background:var(--missing);color:#fff;font-size:11px;line-height:16px;text-align:center;font-weight:700}
+.trq{background:var(--sleeve);border-radius:12px;padding:12px;box-shadow:inset 0 0 0 2px var(--violet);display:grid;gap:8px;margin-bottom:10px}
+.trq.wait{box-shadow:inset 0 0 0 1px var(--line)}
+.trq.rej{box-shadow:inset 0 0 0 2px var(--missing)}
+.trq .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.trq .st{font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;background:var(--paper);border-radius:10px;padding:3px;gap:3px;margin-bottom:12px}
+.seg button{border:0;background:none;border-radius:8px;padding:6px 18px;font-size:15px}
+.seg button[aria-pressed="true"]{background:var(--sleeve);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:700}
+.txf{display:grid;gap:6px;margin-bottom:12px}
+.txf>b{font-size:14px}
+.txf select,.txf input{font:inherit;font-size:16px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--sleeve);color:var(--ink);width:100%}
+.pick{max-height:236px;overflow:auto;display:grid;gap:4px;border:1px solid var(--line);border-radius:10px;padding:4px;background:var(--paper)}
+.pick button{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;text-align:left;border:1px solid transparent;background:var(--sleeve);border-radius:8px;padding:4px 8px;font-size:14px}
+.pick button[aria-pressed="true"]{border-color:var(--violet);background:var(--violet-soft)}
+.pick .art{border-radius:3px}.pick .ph *{display:none}
+.pick .need{font-size:11px;font-weight:700;color:#fff;background:var(--ok);border-radius:4px;padding:2px 5px}
+.pick .empty{padding:14px;font-size:13px}
+.txsum{background:var(--paper);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:10px}
 
 /* dialogs */
 dialog{border:0;border-radius:16px;padding:0;max-width:min(560px,94vw);width:100%;color:var(--ink);background:var(--sleeve);box-shadow:0 20px 60px rgba(20,18,50,.35)}
@@ -199,7 +221,7 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
     <button role="tab" data-tab="mine" aria-selected="true">我的登記</button>
     <button role="tab" data-tab="team" aria-selected="false">全隊進度</button>
     <button role="tab" data-tab="trade" aria-selected="false">交換建議</button>
-    <button role="tab" data-tab="log" aria-selected="false">交換紀錄</button>
+    <button role="tab" data-tab="log" aria-selected="false">贈送交換紀錄<span class="tbadge" id="logBadge" hidden></span></button>
   </nav>
 </header>
 <div id="bannerWrap" style="padding:0 16px"></div>
@@ -239,12 +261,27 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
   </section>
 
   <section id="tab-log" hidden>
-    <p class="lead">最近 100 筆贈送與交換。自己送出的紀錄記錯了，可以按「復原」，雙方張數會改回去。</p>
+    <div class="log-head">
+      <div class="chips" id="logFilter" style="margin:0"></div>
+      <button class="btn" id="newTxBtn" type="button">＋ 記錄贈送／交換</button>
+    </div>
+    <div id="trqList"></div>
+    <p class="lead">最近 100 筆紀錄。自己送出的卡記錯了，可以按「復原」，雙方張數會改回去。</p>
     <div class="log" id="logList"></div>
   </section>
 </main>
 
 <dialog id="cardDlg"><div class="dlg" id="cardBody"></div></dialog>
+<dialog id="txDlg"><div class="dlg">
+  <div class="dlg-head"><h3>記錄贈送／交換</h3><button class="x" type="button" data-close aria-label="關閉">✕</button></div>
+  <div class="seg" role="group"><button type="button" data-mode="gift">贈送</button><button type="button" data-mode="trade">交換</button></div>
+  <div class="txf"><b>對象</b><select id="txTo"></select></div>
+  <div class="txf"><b id="txGiveLbl">我送出的卡</b><input id="txQ1" type="search" placeholder="搜尋名稱或編號" autocomplete="off"><div class="pick" id="txGive"></div></div>
+  <div class="txf" id="txGetWrap"><b>我收到的卡（需同稀有度）</b><input id="txQ2" type="search" placeholder="搜尋名稱或編號" autocomplete="off"><div class="pick" id="txGet"></div></div>
+  <div class="txsum" id="txSum"></div>
+  <button class="btn" id="txGo" type="button" style="width:100%">確認記錄</button>
+  <p class="hint" id="txHint"></p>
+</div></dialog>
 <dialog id="whoDlg"><div class="dlg">
   <div class="dlg-head"><h3 id="whoTitle">登入</h3><button class="x" type="button" data-close aria-label="關閉">✕</button></div>
   <div id="loginBox">
@@ -309,7 +346,7 @@ const lsGet = k => { try { return localStorage.getItem(k) } catch { return null 
 const lsSet = (k,v) => { try { localStorage.setItem(k,v) } catch {} };
 
 const S = {
-  players:new Map(), order:[], logs:[], loaded:false,
+  players:new Map(), order:[], logs:[], trades:[], logF:'all', loaded:false,
   me:null, view: lsGet('b4b-view'), tab:'mine', openCard:null,
   f:{ q:'', status:'all', groups:new Set(), rar:new Set() },
   includeLast:false, mineOnly:true, sugs:[]
@@ -340,7 +377,9 @@ function errMsg(e){
   if (m.includes('invalid-credential')||m.includes('wrong-password')||m.includes('user-not-found')||m.includes('invalid-email')) return '帳號或驗證碼不正確。';
   if (m.includes('too-many-requests')) return '嘗試次數太多，請稍後再試。';
   if (m.includes('permission')) return '沒有權限：只能修改自己的資料、記錄自己送出的卡。';
+  if (m.includes('NO_CARD_THEM')) return '對方目前沒有你要換的那張卡，請對方先更新張數。';
   if (m.includes('NO_CARD')) return '你目前沒有這張卡，無法送出。';
+  if (m.includes('TRADE_GONE')) return '這筆交換已經被處理過了。';
   if (m.includes('UNDO_EMPTY')) return '收到卡的人已經沒有這張了，無法復原。';
   if (m.includes('UNDONE')) return '這筆已經復原過了。';
   return '操作失敗：' + m;
@@ -362,38 +401,62 @@ function makeDemoStore(){
       }
       players['demo'+i] = p;
     });
-    return {players, logs:[]};
+    return {players, logs:[], trades:[]};
   };
   let db; try { db = JSON.parse(lsGet(KEY)) } catch {}
   if (!db || !db.players) db = seed();
-  let onP=()=>{}, onL=()=>{}, onA=()=>{};
+  db.trades ||= [];
+  let onP=()=>{}, onL=()=>{}, onA=()=>{}, onT=()=>{};
   const emit = () => {
     onP(Object.entries(db.players).map(([id,p])=>({id,...JSON.parse(JSON.stringify(p))})));
     onL([...db.logs].sort((a,b)=>b.at-a.at).slice(0,100).map(l=>({...l})));
+    onT([...db.trades].sort((a,b)=>b.at-a.at).slice(0,100).map(x=>({...x})));
   };
+  const uid = p => p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   const save = () => { lsSet(KEY, JSON.stringify(db)); emit(); };
   return {
     demo:true,
-    subscribe(a,b,c){ onP=a; onL=b; onA=c; emit(); onA(lsGet('b4b-me')); },
+    subscribe(a,b,c,d){ onP=a; onL=b; onA=c; onT=d||onT; emit(); onA(lsGet('b4b-me')); },
     pick(id){ lsSet('b4b-me',id); onA(id); },
     async signOut(){ lsSet('b4b-me',''); onA(null); },
     async rename(id,name){ db.players[id].name=name; save(); },
     async patch(id,patch){ const p=db.players[id]; Object.assign(p.counts,patch.counts); Object.assign(p.ever,patch.ever); save(); },
-    async transfer(from,to,n){
+    _move(from,to,n,extra={}){
       const a=db.players[from], b=db.players[to], k=key(n);
       if (!((a.counts[k]||0) > 0)) throw new Error('NO_CARD');
       const newUnlock = !(b.ever[k] || (b.counts[k]||0)>0);
       a.counts[k]=(a.counts[k]||0)-1; b.counts[k]=(b.counts[k]||0)+1; b.ever[k]=true; a.ever[k]=true;
-      db.logs.push({id:'l'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),from,to,card:n,at:Date.now(),newUnlock,undone:false,fromName:a.name,toName:b.name});
-      save();
+      const id=uid('l');
+      db.logs.push({id,from,to,card:n,at:Date.now(),newUnlock,undone:false,fromName:a.name,toName:b.name,kind:extra.kind||'gift',...(extra.tradeId?{tradeId:extra.tradeId}:{})});
+      return id;
     },
-    async undo(id){
-      const l=db.logs.find(x=>x.id===id); if(!l) return; if(l.undone) throw new Error('UNDONE');
+    _undo(l){
       const a=db.players[l.from], b=db.players[l.to], k=key(l.card);
       if (!((b.counts[k]||0) > 0)) throw new Error('UNDO_EMPTY');
       b.counts[k]--; a.counts[k]=(a.counts[k]||0)+1;
       if (l.newUnlock && b.counts[k]===0) b.ever[k]=false;
-      l.undone=true; save();
+      l.undone=true;
+    },
+    async transfer(from,to,n){ this._move(from,to,n,{kind:'gift'}); save(); },
+    async undo(id){
+      const l=db.logs.find(x=>x.id===id); if(!l) return; if(l.undone) throw new Error('UNDONE');
+      this._undo(l); save();
+    },
+    async proposeTrade(from,to,give,get){
+      const a=db.players[from], b=db.players[to];
+      if (!((b.counts[key(get)]||0)>0)) throw new Error('NO_CARD_THEM');
+      const id=uid('t'); const giveLog=this._move(from,to,give,{kind:'trade',tradeId:id});
+      db.trades.push({id,from,to,give,get,status:'pending',at:Date.now(),fromName:a.name,toName:b.name,giveLog}); save();
+    },
+    async acceptTrade(id){
+      const t=db.trades.find(x=>x.id===id); if(!t||t.status!=='pending') throw new Error('TRADE_GONE');
+      t.acceptLog=this._move(t.to,t.from,t.get,{kind:'trade',tradeId:id}); t.status='done'; t.doneAt=Date.now(); save();
+    },
+    async rejectTrade(id){ const t=db.trades.find(x=>x.id===id); if(t&&t.status==='pending'){ t.status='rejected'; t.doneAt=Date.now(); save(); } },
+    async cancelTrade(id){
+      const t=db.trades.find(x=>x.id===id); if(!t||!['pending','rejected'].includes(t.status)) throw new Error('TRADE_GONE');
+      const l=db.logs.find(x=>x.id===t.giveLog); if (l && !l.undone) this._undo(l);
+      t.status='cancelled'; t.doneAt=Date.now(); save();
     },
     reset(){ db=seed(); save(); }
   };
@@ -410,14 +473,38 @@ async function makeFirebaseStore(cfg){
   const app = initializeApp(cfg);
   const auth = getAuth(app), db = getFirestore(app);
   const pRef = id => doc(db,'players',id);
+  // Firestore 交易規定：先讀完所有資料，再寫入
+  const readPair = async (tx,x,y) => [(await tx.get(pRef(x))).data(), (await tx.get(pRef(y))).data()];
+  function writeMove(tx,from,to,a,b,n,extra){
+    const k=key(n), lr=doc(collection(db,'logs'));
+    const ac=a.counts?.[k]||0, bc=b.counts?.[k]||0;
+    if (ac<1) throw new Error('NO_CARD');
+    const newUnlock = !(b.ever?.[k] || bc>0);
+    tx.set(lr,{from,to,card:n,at:serverTimestamp(),newUnlock,undone:false,fromName:a.name,toName:b.name,kind:extra.kind,...(extra.tradeId?{tradeId:extra.tradeId}:{})});
+    tx.update(pRef(from),{['counts.'+k]:ac-1,['ever.'+k]:true,updatedAt:serverTimestamp()});
+    tx.update(pRef(to),{['counts.'+k]:bc+1,['ever.'+k]:true,lastIn:lr.id,updatedAt:serverTimestamp()});
+    return lr.id;
+  }
+  function writeUndo(tx,lr,l,a,b){
+    const k=key(l.card), bc=b.counts?.[k]||0, ac=a.counts?.[k]||0;
+    if (bc<1) throw new Error('UNDO_EMPTY');
+    tx.update(lr,{undone:true,undoneAt:serverTimestamp()});
+    const ub={['counts.'+k]:bc-1,lastIn:lr.id,updatedAt:serverTimestamp()};
+    if (l.newUnlock && bc-1===0) ub['ever.'+k]=false;
+    tx.update(pRef(l.to),ub);
+    tx.update(pRef(l.from),{['counts.'+k]:ac+1,updatedAt:serverTimestamp()});
+  }
   return {
     demo:false,
-    subscribe(onP,onL,onA){
+    subscribe(onP,onL,onA,onT){
       onSnapshot(collection(db,'players'),
         snap => onP(snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}))),
         e => banner(esc(errMsg(e)),true));
       onSnapshot(query(collection(db,'logs'),orderBy('at','desc'),limit(100)),
         snap => onL(snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}))),
+        e => console.warn(e));
+      onSnapshot(query(collection(db,'trades'),orderBy('at','desc'),limit(100)),
+        snap => onT(snap.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}))),
         e => console.warn(e));
       onAuthStateChanged(auth, async u => {
         if (u){
@@ -441,30 +528,45 @@ async function makeFirebaseStore(cfg){
       return updateDoc(pRef(id),u);
     },
     transfer(from,to,n){
-      const k=key(n), lr=doc(collection(db,'logs'));
       return runTransaction(db, async tx => {
-        const a=(await tx.get(pRef(from))).data(), b=(await tx.get(pRef(to))).data();
-        const ac=a.counts?.[k]||0, bc=b.counts?.[k]||0;
-        if (ac<1) throw new Error('NO_CARD');
-        const newUnlock = !(b.ever?.[k] || bc>0);
-        tx.set(lr,{from,to,card:n,at:serverTimestamp(),newUnlock,undone:false,fromName:a.name,toName:b.name});
-        tx.update(pRef(from),{['counts.'+k]:ac-1,['ever.'+k]:true,updatedAt:serverTimestamp()});
-        tx.update(pRef(to),{['counts.'+k]:bc+1,['ever.'+k]:true,lastIn:lr.id,updatedAt:serverTimestamp()});
+        const [a,b]=await readPair(tx,from,to);
+        writeMove(tx,from,to,a,b,n,{kind:'gift'});
       });
     },
     undo(id){
       return runTransaction(db, async tx => {
         const lr=doc(db,'logs',id); const l=(await tx.get(lr)).data();
         if (l.undone) throw new Error('UNDONE');
-        const k=key(l.card);
-        const a=(await tx.get(pRef(l.from))).data(), b=(await tx.get(pRef(l.to))).data();
-        const bc=b.counts?.[k]||0, ac=a.counts?.[k]||0;
-        if (bc<1) throw new Error('UNDO_EMPTY');
-        tx.update(lr,{undone:true,undoneAt:serverTimestamp()});
-        const ub={['counts.'+k]:bc-1,lastIn:id,updatedAt:serverTimestamp()};
-        if (l.newUnlock && bc-1===0) ub['ever.'+k]=false;
-        tx.update(pRef(l.to),ub);
-        tx.update(pRef(l.from),{['counts.'+k]:ac+1,updatedAt:serverTimestamp()});
+        const [a,b]=await readPair(tx,l.from,l.to);
+        writeUndo(tx,lr,l,a,b);
+      });
+    },
+    proposeTrade(from,to,give,get){
+      const tr=doc(collection(db,'trades'));
+      return runTransaction(db, async tx => {
+        const [a,b]=await readPair(tx,from,to);
+        if (!((b.counts?.[key(get)]||0)>0)) throw new Error('NO_CARD_THEM');
+        const giveLog=writeMove(tx,from,to,a,b,give,{kind:'trade',tradeId:tr.id});
+        tx.set(tr,{from,to,give,get,status:'pending',at:serverTimestamp(),fromName:a.name,toName:b.name,giveLog});
+      });
+    },
+    acceptTrade(id){
+      const tr=doc(db,'trades',id);
+      return runTransaction(db, async tx => {
+        const t=(await tx.get(tr)).data(); if (!t || t.status!=='pending') throw new Error('TRADE_GONE');
+        const [b,a]=await readPair(tx,t.to,t.from);
+        const acceptLog=writeMove(tx,t.to,t.from,b,a,t.get,{kind:'trade',tradeId:id});
+        tx.update(tr,{status:'done',acceptLog,doneAt:serverTimestamp()});
+      });
+    },
+    rejectTrade:(id) => updateDoc(doc(db,'trades',id),{status:'rejected',doneAt:serverTimestamp()}),
+    cancelTrade(id){
+      const tr=doc(db,'trades',id);
+      return runTransaction(db, async tx => {
+        const t=(await tx.get(tr)).data(); if (!t || !['pending','rejected'].includes(t.status)) throw new Error('TRADE_GONE');
+        const lr=doc(db,'logs',t.giveLog); const l=(await tx.get(lr)).data();
+        if (l && !l.undone){ const [a,b]=await readPair(tx,l.from,l.to); writeUndo(tx,lr,l,a,b); }
+        tx.update(tr,{status:'cancelled',doneAt:serverTimestamp()});
       });
     }
   };
@@ -481,11 +583,25 @@ function onPlayers(list){
   refresh();
 }
 function onLogs(list){ S.logs=list; if (S.tab==='log') renderLog(); }
+let notified=false;
+function onTrades(list){
+  S.trades=list; renderBadge(); if (S.tab==='log') renderLog();
+  if (S.me && !notified){ notified=true; const k=myIncoming().length; if(k) toast(`你有 ${k} 筆交換等待確認，請到「贈送交換紀錄」查看`); }
+}
+const myIncoming = () => S.trades.filter(t=>t.status==='pending' && t.to===S.me);
+function renderBadge(){ const k=S.me?myIncoming().length:0, b=$('#logBadge'); b.hidden=!k; b.textContent=k; }
 function onAuth(uid){
   const changed = S.me !== (uid||null);
   S.me = uid || null; pending.clear();
-  if (changed && S.me){ S.view=S.me; lsSet('b4b-view',S.me); }
-  lastList=''; refresh();
+  notified=false;
+  if (changed && S.me){
+    // 登入後自動切到自己的卡冊
+    S.view=S.me; lsSet('b4b-view',S.me);
+    resetFilters(); setTab('mine', true);
+    if ($('#whoDlg').open) $('#whoDlg').close();
+  }
+  lastList=''; refresh(); renderBadge();
+  if (S.me && S.trades.length) onTrades(S.trades);
 }
 
 let flushT;
@@ -537,6 +653,11 @@ function initFilters(){
   fr.addEventListener('click',e=>toggleSet(e,S.f.rar,true));
   $('#q').addEventListener('input',e=>{ S.f.q=e.target.value.trim().toLowerCase(); renderGrid(); });
   $('#viewSel').addEventListener('change',e=>{ S.view=e.target.value; lsSet('b4b-view',S.view); lastList=''; refresh(); });
+}
+function resetFilters(){
+  S.f={ q:'', status:'all', groups:new Set(), rar:new Set() }; $('#q').value='';
+  document.querySelectorAll('#fStatus .chip').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v==='all'));
+  document.querySelectorAll('#fType .chip,#fRar .chip').forEach(x=>x.setAttribute('aria-pressed','false'));
 }
 function toggleSet(e,set,num){
   const b=e.target.closest('.chip'); if(!b) return;
@@ -616,7 +737,11 @@ function renderCard(){
   const n=S.openCard; if(n==null) return; const c=BYN.get(n), p=me(), v=viewP();
   const rows = all().map(o=>{
     const isMe=o.id===S.me, cnt=C(o,n), ev=E(o,n);
-    const acts = (p && !isMe && C(p,n)>0) ? `<button class="btn small${ev?' ghost':''}" data-give="${esc(o.id)}">送他 1 張</button>` : '';
+    let acts='';
+    if (p && !isMe){
+      if (C(p,n)>0) acts+=`<button class="btn small${ev?' ghost':''}" data-give="${esc(o.id)}">送他 1 張</button>`;
+      if (cnt>0) acts+=`<button class="btn small ghost" data-swap="${esc(o.id)}">跟他換這張</button>`;
+    }
     return `<tr class="${isMe?'me':''}"><td>${esc(o.name)}${isMe?'（我）':''}</td><td>${cnt}</td>
       <td class="${ev?'st-ok':'st-never'}">${ev?'已解鎖':'未解鎖'}</td><td class="acts"><span class="acts-in">${acts}</span></td></tr>`;
   }).join('');
@@ -634,7 +759,7 @@ function renderCard(){
       </div>
     </div>
     <table class="who-has"><thead><tr><th>玩家</th><th>張數</th><th>圖鑑</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="4">還沒有玩家</td></tr>'}</tbody></table>
-    <p class="hint">每筆贈送由送出的人記錄，請先在遊戲中完成交換再按。收到卡的人不用另外登記。</p>`;
+    <p class="hint">請先在遊戲中完成再記錄。贈送由送出的人記錄；交換由一方發起，另一方按確認後雙方張數才會全部更新。</p>`;
 }
 $('#cardDlg').addEventListener('click', async e=>{
   const d=$('#cardDlg'), n=S.openCard, p=me();
@@ -642,6 +767,8 @@ $('#cardDlg').addEventListener('click', async e=>{
   const my=e.target.closest('[data-my]'); if (my && p) return setMine(n, C(p,n)+Number(my.dataset.my), E(p,n));
   const g=e.target.closest('[data-give]');
   if (g && confirm(`記錄：你送 #${n} ${BYN.get(n).zh} 給 ${pname(g.dataset.give)}？`)) await giveTo(g.dataset.give,n);
+  const sw=e.target.closest('[data-swap]');
+  if (sw){ d.close(); openTx({mode:'trade',to:sw.dataset.swap,get:n}); }
 });
 $('#cardDlg').addEventListener('change',e=>{ if(e.target.id==='everBox'){ const p=me(), n=S.openCard; setMine(n,C(p,n),e.target.checked); } });
 $('#cardDlg').addEventListener('close',()=>{ S.openCard=null; });
@@ -710,11 +837,8 @@ function leg(from,to,n,extra=''){
   return `<div class="leg">${art(c)}<span><b>${esc(pname(from))}</b> 給 <b>${esc(pname(to))}</b>：#${c.n} ${esc(c.zh)} <span class="rar">${dia(c.rar)}</span>${extra}</span></div>`;
 }
 function sugAction(s,i){
-  const mine = s.a===S.me ? {to:s.b,n:s.x} : (s.b===S.me && s.y!=null) ? {to:s.a,n:s.y} : null;
-  const partner = s.a===S.me ? s.b : s.a;
-  if (mine) return `<button class="btn" data-sug="${i}">已在遊戲中換好，記錄我送出的卡</button>`+
-    (s.y!=null||s.b===S.me ? `<span class="wait">${esc(pname(partner))} 送你的卡由他自己記錄。</span>` : '');
-  return `<span class="wait">由${esc(pname(s.a))}${s.y!=null?'和'+esc(pname(s.b)):''}各自記錄送出的卡。</span>`;
+  if (s.a===S.me || s.b===S.me) return `<button class="btn" data-sug="${i}">照這個建議記錄交換（可修改）</button>`;
+  return `<span class="wait">由${esc(pname(s.a))}或${esc(pname(s.b))}發起記錄。</span>`;
 }
 function renderTrade(){
   const all_=computeSugs();
@@ -733,32 +857,142 @@ function renderTrade(){
 }
 $('#sugList').addEventListener('click',async e=>{
   const b=e.target.closest('[data-sug]'); if(!b) return; const s=S.sugs[Number(b.dataset.sug)]; if(!s) return;
-  const t = s.a===S.me ? {to:s.b,n:s.x} : {to:s.a,n:s.y};
-  b.disabled=true;
-  if (await giveTo(t.to,t.n,true)) toast(`已記錄：送 ${BYN.get(t.n).zh} 給 ${pname(t.to)}`); else b.disabled=false;
+  if (s.a===S.me) openTx({mode:'trade',to:s.b,give:s.x,get:s.y});
+  else openTx({mode:'trade',to:s.a,give:s.y,get:s.x});
 });
 $('#optMine').addEventListener('change',e=>{ S.mineOnly=e.target.checked; renderTrade(); });
 $('#optLast').addEventListener('change',e=>{ S.includeLast=e.target.checked; refresh(); });
 
 /* ================= 紀錄 ================= */
+const fmt=new Intl.DateTimeFormat('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const tdate = x => x?.toDate ? x.toDate() : new Date(x||Date.now());
+const cardTxt = n => { const c=BYN.get(n); return `#${n} ${esc(c?.zh)} <span class="rar">${dia(c?.rar||0)}</span>`; };
+const LOGF=[['all','全部'],['gift','贈送'],['trade','交換'],['mine','與我有關']];
+function renderTrq(){
+  const box=$('#trqList');
+  const list=S.trades.filter(t=>t.status==='pending' || (t.status==='rejected' && t.from===S.me));
+  if (!list.length){ box.innerHTML=''; return; }
+  box.innerHTML='<h2 style="margin-top:4px">進行中的交換</h2>'+list.map(t=>{
+    const fn=pname(t.from), tn=pname(t.to);
+    const body=`<div class="leg">${art(BYN.get(t.give))}<span><b>${esc(fn)}</b> 給 <b>${esc(tn)}</b>：${cardTxt(t.give)}</span></div>
+      <div class="leg">${art(BYN.get(t.get))}<span><b>${esc(tn)}</b> 給 <b>${esc(fn)}</b>：${cardTxt(t.get)}</span></div>`;
+    if (t.status==='rejected') return `<div class="trq rej"><span class="st">${fmt.format(tdate(t.at))}　${esc(tn)} 拒絕了這筆交換。你送出的那張已經先記錄，請按取消把張數改回去。</span>${body}
+      <div class="row"><button class="btn" data-tcancel="${esc(t.id)}">取消並復原我送出的卡</button></div></div>`;
+    if (t.to===S.me) return `<div class="trq"><span class="st">${fmt.format(tdate(t.at))}　${esc(fn)} 記錄了一筆和你的交換，請確認：</span>${body}
+      <div class="row"><button class="btn" data-taccept="${esc(t.id)}">確認，遊戲裡已經換好了</button><button class="btn ghost" data-treject="${esc(t.id)}">拒絕</button></div></div>`;
+    if (t.from===S.me) return `<div class="trq wait"><span class="st">${fmt.format(tdate(t.at))}　等待 ${esc(tn)} 確認。對方確認前，只有你送出的那張已更新。</span>${body}
+      <div class="row"><button class="btn ghost" data-tcancel="${esc(t.id)}">取消這筆交換</button></div></div>`;
+    return `<div class="trq wait"><span class="st">${fmt.format(tdate(t.at))}　等待 ${esc(tn)} 確認</span>${body}</div>`;
+  }).join('');
+}
 function renderLog(){
+  const lf=$('#logFilter');
+  if (!lf.children.length) lf.innerHTML=LOGF.map(([v,l])=>`<button class="chip" type="button" data-lf="${v}">${l}</button>`).join('');
+  lf.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lf===S.logF));
+  $('#newTxBtn').hidden=!S.me;
+  renderTrq(); renderBadge();
   const box=$('#logList');
-  if (!S.logs.length){ box.innerHTML='<div class="empty">還沒有任何交換紀錄。在卡片詳情或「交換建議」記錄第一筆。</div>'; return; }
-  const fmt=new Intl.DateTimeFormat('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  box.innerHTML = S.logs.map(l=>{
-    const t = l.at?.toDate ? l.at.toDate() : new Date(l.at||Date.now()); const c=BYN.get(l.card);
+  const logs=S.logs.filter(l=>{
+    const k=l.kind||'gift';
+    if (S.logF==='gift') return k==='gift';
+    if (S.logF==='trade') return k==='trade';
+    if (S.logF==='mine') return l.from===S.me||l.to===S.me;
+    return true;
+  });
+  if (!logs.length){ box.innerHTML=`<div class="empty">${S.logs.length?'沒有符合這個分類的紀錄。':'還沒有任何紀錄。按上方「記錄贈送／交換」，或在卡片詳情、交換建議記錄第一筆。'}</div>`; return; }
+  box.innerHTML = logs.map(l=>{
+    const t = tdate(l.at); const c=BYN.get(l.card), k=l.kind||'gift';
     const fn = S.players.get(l.from)?.name ?? l.fromName, tn = S.players.get(l.to)?.name ?? l.toName;
-    const can = !l.undone && l.from===S.me;
+    const can = !l.undone && l.from===S.me && !(l.kind==='trade' && S.trades.some(x=>x.id===l.tradeId && ['pending','rejected'].includes(x.status)));
     return `<div class="lrow ${l.undone?'undone':''}"><span class="tm">${fmt.format(t)}</span>
+      <span class="kb ${k}">${k==='trade'?'交換':'贈送'}</span>
       <span class="tx">${esc(fn)} → ${esc(tn)}：#${l.card} ${esc(c?.zh)}${l.newUnlock?'（新解鎖）':''}${l.undone?'（已復原）':''}</span>
       ${can?`<button class="btn small ghost" data-undo="${esc(l.id)}">復原</button>`:''}</div>`;
   }).join('');
 }
+$('#logFilter').addEventListener('click',e=>{ const b=e.target.closest('[data-lf]'); if(!b) return; S.logF=b.dataset.lf; renderLog(); });
+$('#newTxBtn').addEventListener('click',()=>openTx({mode:'gift'}));
+$('#trqList').addEventListener('click',async e=>{
+  const a=e.target.closest('[data-taccept]'), r=e.target.closest('[data-treject]'), c=e.target.closest('[data-tcancel]');
+  const b=a||r||c; if(!b) return;
+  if (r && !confirm('拒絕這筆交換？對方需要再取消，才會把他送出的卡改回去。')) return;
+  if (c && !confirm('取消這筆交換？你送出的那張卡會改回去。')) return;
+  b.disabled=true;
+  try {
+    await flush();
+    if (a){ await store.acceptTrade(a.dataset.taccept); toast('已確認，雙方張數都更新了'); }
+    if (r){ await store.rejectTrade(r.dataset.treject); toast('已拒絕'); }
+    if (c){ await store.cancelTrade(c.dataset.tcancel); toast('已取消並復原'); }
+  } catch(err){ toast(errMsg(err)); b.disabled=false; }
+});
 $('#logList').addEventListener('click',async e=>{
   const b=e.target.closest('[data-undo]'); if(!b) return;
   if (!confirm('復原這筆紀錄？雙方張數會改回去。')) return;
   b.disabled=true; try { await flush(); await store.undo(b.dataset.undo); toast('已復原'); } catch(err){ toast(errMsg(err)); b.disabled=false; }
 });
+
+/* ================= 自選贈送／交換 ================= */
+const TX={mode:'gift',to:null,give:null,get:null};
+function openTx(o={}){
+  if (!me()) return openWho();
+  const os=othersOf(me()); if (!os.length) return toast('還沒有其他玩家可以贈送或交換');
+  Object.assign(TX,{mode:'gift',to:null,give:null,get:null},o);
+  if (!TX.to || !S.players.has(TX.to)) TX.to=os[0].id;
+  $('#txTo').innerHTML=os.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  $('#txTo').value=TX.to; $('#txQ1').value=''; $('#txQ2').value='';
+  renderTx(); const d=$('#txDlg'); if(!d.open) d.showModal();
+}
+function pickRows(list,sel,owner,other,needLbl){
+  if (!list.length) return '<div class="empty">沒有可選的卡</div>';
+  return list.map(c=>`<button type="button" data-n="${c.n}" aria-pressed="${c.n===sel}">${art(c)}
+    <span>#${c.n} ${esc(c.zh)} <span class="rar">${dia(c.rar)}</span><br><small style="color:var(--muted)">${esc(owner.name)}有 ${C(owner,c.n)} 張</small></span>
+    ${!E(other,c.n)?`<span class="need">${needLbl}</span>`:''}</button>`).join('');
+}
+function qMatch(c,q){ q=q.trim().toLowerCase().replace(/^#/,''); return !q || c.zh.toLowerCase().includes(q) || c.en.toLowerCase().includes(q) || String(c.n).includes(q); }
+function renderTx(){
+  const m=me(), o=S.players.get(TX.to), trade=TX.mode==='trade';
+  document.querySelectorAll('#txDlg [data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===TX.mode));
+  $('#txGetWrap').hidden=!trade;
+  $('#txGiveLbl').textContent = trade ? '我送出的卡' : '要送出的卡';
+  if (TX.give!=null && C(m,TX.give)<1) TX.give=null;
+  if (TX.get!=null && C(o,TX.get)<1) TX.get=null;
+  if (trade && TX.give!=null && TX.get!=null && BYN.get(TX.give).rar!==BYN.get(TX.get).rar) TX.get=null;
+  const rar = trade ? (TX.get!=null?BYN.get(TX.get).rar:null) : null;
+  const sortNeed=(other)=>(a,b)=>(E(other,a.n)-E(other,b.n))||a.n-b.n;
+  const gl=CARDS.filter(c=>C(m,c.n)>0 && (rar==null||c.rar===rar) && qMatch(c,$('#txQ1').value)).sort(sortNeed(o));
+  $('#txGive').innerHTML=pickRows(gl,TX.give,m,o,`${o.name}未解鎖`);
+  if (trade){
+    const r2 = TX.give!=null?BYN.get(TX.give).rar:null;
+    const tl=CARDS.filter(c=>C(o,c.n)>0 && (r2==null||c.rar===r2) && qMatch(c,$('#txQ2').value)).sort(sortNeed(m));
+    $('#txGet').innerHTML=pickRows(tl,TX.get,o,m,'我未解鎖');
+  }
+  const ok = TX.give!=null && (!trade || TX.get!=null);
+  $('#txSum').innerHTML = !ok ? (trade?'選擇你送出的卡和收到的卡（兩張需同稀有度）。':'選擇要送給對方的卡。')
+    : trade ? `你給 <b>${esc(o.name)}</b> ${cardTxt(TX.give)}<br><b>${esc(o.name)}</b> 給你 ${cardTxt(TX.get)}`
+    : `你送給 <b>${esc(o.name)}</b> ${cardTxt(TX.give)}${!E(o,TX.give)?'（對方新解鎖）':''}`;
+  $('#txGo').disabled=!ok;
+  $('#txGo').textContent = trade ? '送出交換紀錄，等待對方確認' : '確認記錄贈送';
+  $('#txHint').textContent = trade ? '你送出的卡會立刻更新；對方在「贈送交換紀錄」按確認後，他送你的卡才會更新。對方確認前你可以取消。' : '對方的張數會自動 +1，不用另外登記。';
+}
+$('#txDlg').addEventListener('click',async e=>{
+  const d=$('#txDlg');
+  if (outside(e,d) || e.target.closest('[data-close]')) return d.close();
+  const md=e.target.closest('[data-mode]'); if (md){ TX.mode=md.dataset.mode; return renderTx(); }
+  const pk=e.target.closest('.pick [data-n]');
+  if (pk){ const n=Number(pk.dataset.n), side=pk.closest('.pick').id==='txGive'?'give':'get'; TX[side]= TX[side]===n?null:n; return renderTx(); }
+  if (e.target.closest('#txGo')){
+    const b=$('#txGo'); b.disabled=true;
+    try {
+      await flush();
+      if (TX.mode==='gift'){ await store.transfer(S.me,TX.to,TX.give); toast(`已記錄：送 ${BYN.get(TX.give).zh} 給 ${pname(TX.to)}`); }
+      else { await store.proposeTrade(S.me,TX.to,TX.give,TX.get); toast(`已送出交換紀錄，等待 ${pname(TX.to)} 確認`); }
+      d.close();
+    } catch(err){ toast(errMsg(err)); b.disabled=false; }
+  }
+});
+$('#txTo').addEventListener('change',e=>{ TX.to=e.target.value; TX.get=null; renderTx(); });
+$('#txQ1').addEventListener('input',renderTx);
+$('#txQ2').addEventListener('input',renderTx);
 
 /* ================= 登入 ================= */
 function openWho(){
@@ -800,7 +1034,7 @@ async function doLogin(){
   if (!acct) return toast('請先選擇或輸入帳號');
   if (!code) return toast('請輸入驗證碼');
   $('#loginBtn').disabled=true;
-  try { await store.signIn(acct,code); loginAcct=acct.split('@')[0]; lsSet('b4b-acct',loginAcct); $('#code').value=''; $('#whoDlg').close(); toast('登入成功，點卡片下方的 + 開始登記'); }
+  try { await store.signIn(acct,code); loginAcct=acct.split('@')[0]; lsSet('b4b-acct',loginAcct); $('#code').value=''; $('#whoDlg').close(); toast('登入成功，已切換到你的卡冊'); }
   catch(e){ toast(errMsg(e)); }
   $('#loginBtn').disabled=false;
 }
@@ -813,12 +1047,13 @@ $('#renameBtn').addEventListener('click',async()=>{
 $('#logoutBtn').addEventListener('click',async()=>{ await flush(); await store.signOut(); $('#whoDlg').close(); toast('已登出'); });
 
 /* ================= 分頁與整體刷新 ================= */
-document.querySelector('.tabs').addEventListener('click',e=>{
-  const b=e.target.closest('[data-tab]'); if(!b) return; S.tab=b.dataset.tab;
-  document.querySelectorAll('.tabs [data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
-  for (const t of ['mine','team','trade','log']) $('#tab-'+t).hidden = t!==S.tab;
-  refresh(); scrollTo({top:0});
-});
+function setTab(tab,quiet){
+  S.tab=tab;
+  document.querySelectorAll('.tabs [data-tab]').forEach(x=>x.setAttribute('aria-selected',x.dataset.tab===tab));
+  for (const t of ['mine','team','trade','log']) $('#tab-'+t).hidden = t!==tab;
+  if (!quiet) refresh(); scrollTo({top:0});
+}
+document.querySelector('.tabs').addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(b) setTab(b.dataset.tab); });
 function refresh(){
   renderHead();
   if (S.tab==='mine') renderGrid();
@@ -840,7 +1075,7 @@ if (FIREBASE_CONFIG){
   banner('示範模式：目前資料只存在這台裝置，用來試用介面。照著說明填入 Firebase 設定後，就會變成大家共用，並需要驗證碼才能修改。<button type="button" id="resetDemo">重設示範資料</button>');
   $('#resetDemo').addEventListener('click',()=>{ if(confirm('清除示範資料並重新產生？')) store.reset(); });
 }
-if (store) store.subscribe(onPlayers,onLogs,onAuth);
+if (store) store.subscribe(onPlayers,onLogs,onAuth,onTrades);
 refresh();
 </script>
 </body>
