@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>平行閃卡共享圖鑑｜豪華擴充包 Mega B4b</title>
+<title>平行閃卡共享圖鑑｜高級擴充包MEGA B4b</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@ button{cursor:pointer}
 .who{flex:none;border:1px solid var(--line);background:var(--sleeve);border-radius:999px;padding:6px 14px;font-size:14px}
 .who b{font-family:var(--round);font-weight:400;color:var(--violet)}
 .tabs{display:flex;gap:4px;max-width:1180px;margin:10px auto 0;overflow-x:auto;scrollbar-width:none}
-.tabs button{border:0;background:none;padding:8px 12px 10px;font-size:15px;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button{border:0;background:none;padding:8px 10px 10px;font-size:15px;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--violet);font-weight:700}
 .banner{max-width:1180px;margin:12px auto 0;padding:10px 14px;border-radius:10px;background:var(--violet-soft);font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .banner.err{background:var(--missing-soft);color:#7d1528}
@@ -204,6 +204,45 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 .form-row{display:flex;gap:8px;margin-top:6px}
 .form-row input{flex:1;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:16px;min-width:0}
 .hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.gridbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px;flex-wrap:wrap}
+.gridbar .result{margin:0}
+.seg.sm{margin:0}.seg.sm button{padding:4px 12px;font-size:14px}
+.grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.grid.cols-5 .card{padding:4px;border-radius:8px}
+.grid.cols-5 .meta{margin:4px 1px 3px;gap:3px}
+.grid.cols-5 .meta .nm{font-size:11.5px}
+.grid.cols-5 .meta .no{font-size:10px}
+.grid.cols-5 .rar{display:none}
+.grid.cols-5 .step{grid-template-columns:24px 1fr 24px;gap:2px}
+.grid.cols-5 .step button{height:26px;font-size:16px;border-radius:6px}
+.grid.cols-5 .step output{font-size:14px}
+.grid.cols-5 .tag{font-size:9px;padding:2px 3px}
+.grid.cols-5 .tag.cnt{font-size:11px;padding:2px 4px}
+.grid.cols-5 .ph b{font-size:11px}.grid.cols-5 .ph span{display:none}
+@media (min-width:900px){.grid.cols-5 .meta .nm{font-size:13px}.grid.cols-5 .rar{display:inline}}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:0 0 12px;font-size:14px}
+.ctl label{display:flex;gap:6px;align-items:center}
+.ctl [hidden]{display:none}
+.grow .ph *{display:none}
+.ctl select{font:inherit;font-family:var(--round);border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--sleeve);color:var(--ink)}
+.rhead{display:flex;align-items:baseline;gap:8px;margin:20px 0 8px}
+.rhead h2{margin:0}
+.rhead .rar{font-size:15px}
+.rhead small{color:var(--muted);font-size:13px}
+.pv-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.pv-cols{grid-template-columns:1fr}}
+.pv-col{background:var(--sleeve);border-radius:12px;padding:10px;box-shadow:inset 0 0 0 1px var(--line)}
+.pv-col h3{font-size:14px;font-weight:700;margin:0 0 8px}
+.pick.free{max-height:none;background:none;border:0;padding:0}
+.pick button:disabled{cursor:default;opacity:1}
+.grow{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;background:var(--sleeve);border-radius:10px;padding:8px;box-shadow:inset 0 0 0 1px var(--line);margin-bottom:8px}
+.grow .art{border-radius:5px}
+.grow .t1{font-weight:500}
+.grow .t2{font-size:13px;color:var(--ok)}
+.grow .t2.none{color:var(--muted)}
+.grow .t2.team{color:var(--missing)}
+@media (max-width:460px){.grow{grid-template-columns:44px 1fr}.grow .btn{grid-column:1/-1}}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:90vw;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
 </style>
@@ -213,7 +252,7 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
   <div class="top-row">
     <div class="brand">
       <h1>平行閃卡共享圖鑑</h1>
-      <p>豪華擴充包：Mega（B4b）平行閃卡，共 166 張</p>
+      <p>高級擴充包MEGA（B4b）平行閃卡，共 166 張</p>
     </div>
     <button class="who" id="whoBtn" type="button">我是 <b id="whoName">（選擇）</b></button>
   </div>
@@ -221,7 +260,8 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
     <button role="tab" data-tab="mine" aria-selected="true">我的登記</button>
     <button role="tab" data-tab="team" aria-selected="false">全隊進度</button>
     <button role="tab" data-tab="trade" aria-selected="false">交換建議</button>
-    <button role="tab" data-tab="log" aria-selected="false">贈送交換紀錄<span class="tbadge" id="logBadge" hidden></span></button>
+    <button role="tab" data-tab="gift" aria-selected="false">贈送建議</button>
+    <button role="tab" data-tab="log" aria-selected="false">紀錄<span class="tbadge" id="logBadge" hidden></span></button>
   </nav>
 </header>
 <div id="bannerWrap" style="padding:0 16px"></div>
@@ -235,7 +275,10 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
       <div class="chips" id="fType"><span class="lbl">屬性</span></div>
       <div class="chips" id="fRar"><span class="lbl">稀有度</span></div>
     </div>
-    <p class="result" id="resultTxt"></p>
+    <div class="gridbar">
+      <p class="result" id="resultTxt"></p>
+      <div class="seg sm" role="group" aria-label="每排張數" id="colSeg"><button type="button" data-cols="auto">自動</button><button type="button" data-cols="3">3 排</button><button type="button" data-cols="5">5 排</button></div>
+    </div>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -252,12 +295,23 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
   </section>
 
   <section id="tab-trade" hidden>
-    <p class="lead">遊戲內交換需要同稀有度、一換一。下面是能讓最多人解鎖新卡的配對。先在遊戲中完成交換，再由送出卡片的人按「記錄我送出的卡」，雙方張數會自動更新。</p>
-    <div class="opts">
-      <label><input type="checkbox" id="optMine" checked> 只看跟我有關的</label>
-      <label><input type="checkbox" id="optLast"> 只有 1 張的卡也可以送出</label>
+    <p class="lead">遊戲內交換需要同稀有度、一換一。這裡只列出雙方都能解鎖新卡的配對，從低稀有度開始排。選擇對象可以看你和他之間所有可換的卡，自己決定怎麼換。</p>
+    <div class="ctl">
+      <label>對象 <select id="trWho"></select></label>
+      <label id="trMineWrap"><input type="checkbox" id="optMine" checked> 只看跟我有關的</label>
+      <label><input type="checkbox" class="optLast"> 只有 1 張的卡也可以送出</label>
     </div>
     <div id="sugList"></div>
+  </section>
+
+  <section id="tab-gift" hidden>
+    <p class="lead">從高稀有度開始，列出誰可以把多的卡送給還沒解鎖的人。選擇對象可以看他還缺哪些卡、誰能送。</p>
+    <div class="ctl">
+      <label>收卡的人 <select id="gfWho"></select></label>
+      <label id="gfMineWrap"><input type="checkbox" id="gfMine" checked> 只看我能送的</label>
+      <label><input type="checkbox" class="optLast"> 只有 1 張的卡也可以送出</label>
+    </div>
+    <div id="giftList"></div>
   </section>
 
   <section id="tab-log" hidden>
@@ -309,23 +363,18 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 /* ================= 設定區 ================= */
 // 1) 貼上 Firebase 專案設定（Firebase 主控台 → 專案設定 → 你的應用程式）。
 //    保持 null 時為「示範模式」，資料只存在目前這台裝置的瀏覽器。
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBcewLMvNmcG4Meba25l9D61PYCTpnSV9U",
-  authDomain: "b4acard.firebaseapp.com",
-  projectId: "b4acard",
-  storageBucket: "b4acard.firebasestorage.app",
-  messagingSenderId: "864037056235",
-  appId: "1:864037056235:web:bfa8ff99e15ebad5fc98ae",
-  measurementId: "G-06JEHBTR9F"
-};
+const FIREBASE_CONFIG = null;
 // 2) 帳號後綴：在 Firebase 建立使用者時，Email 填「帳號@這個後綴」，例如 xiaoming@b4b.local
 const ACCOUNT_DOMAIN = 'b4b.local';
 // 3) 卡圖網址。圖片載入失敗時會自動顯示屬性色卡，不影響使用。
-const IMAGE_URL = n => `https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/B4b/B4b_${n}_EN_SM.webp`;
+const IMAGE_URLS = [
+  (n,big) => `https://game.pokemontcgpocket.app/zh-tw/tcgp/B4b/${n}/${big?'high':'low'}.webp`,   // 繁體中文卡圖
+  (n)     => `https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/B4b/B4b_${n}_EN_SM.webp`, // 英文卡圖（備援）
+];
 /* ========================================== */
 
 // [編號, 中文名稱, 英文名稱, 屬性, 稀有度(菱數)]
-const RAW = [[237,"妙蛙種子","Bulbasaur","grass",1],[238,"妙蛙草","Ivysaur","grass",2],[239,"綠毛蟲","Caterpie","grass",1],[240,"鐵甲蛹","Metapod","grass",2],[241,"巴大蝶","Butterfree","grass",3],[242,"飛天螳螂","Scyther","grass",1],[243,"時拉比","Celebi","grass",3],[244,"木守宮","Treecko","grass",1],[245,"森林蜥蜴","Grovyle","grass",2],[246,"含羞苞","Budew","grass",3],[247,"三蜜蜂","Combee","grass",1],[248,"木棉球","Cottonee","grass",1],[249,"百合根娃娃","Petilil","grass",1],[250,"裙兒小姐","Lilligant","grass",3],[251,"鐵蟻","Durant","grass",1],[252,"新葉喵","Sprigatito","grass",1],[253,"蒂蕾喵","Floragato","grass",1],[254,"迷你芙","Smoliv","grass",1],[255,"奧利紐","Dolliv","grass",1],[256,"奧利瓦","Arboliva","grass",3],[257,"厄鬼椪 碧草面具","Teal Mask Ogerpon","grass",3],[258,"小火龍","Charmander","fire",1],[259,"火恐龍","Charmeleon","fire",2],[260,"卡蒂狗","Growlithe","fire",1],[261,"小火馬","Ponyta","fire",1],[262,"火球鼠","Cyndaquil","fire",1],[263,"火岩鼠","Quilava","fire",2],[264,"火稚雞","Torchic","fire",1],[265,"力壯雞","Combusken","fire",2],[266,"呆火駝","Numel","fire",1],[267,"比克提尼","Victini","fire",3],[268,"呆火鱷","Fuecoco","fire",1],[269,"炙燙鱷","Crocalor","fire",1],[270,"骨紋巨聲鱷","Skeledirge","fire",3],[271,"炭小侍","Charcadet","fire",1],[272,"厄鬼椪 火灶面具","Hearthflame Mask Ogerpon","fire",3],[273,"傑尼龜","Squirtle","water",1],[274,"卡咪龜","Wartortle","water",2],[275,"阿羅拉 六尾","Alolan Vulpix","water",1],[276,"呆呆獸","Slowpoke","water",1],[277,"鯉魚王","Magikarp","water",1],[278,"水躍魚","Mudkip","water",1],[279,"沼躍魚","Marshtomp","water",2],[280,"利牙魚","Carvanha","water",1],[281,"吼吼鯨","Wailmer","water",1],[282,"醜醜魚","Feebas","water",1],[283,"呱呱泡蛙","Froakie","water",1],[284,"呱頭蛙","Frogadier","water",2],[285,"淚眼蜥","Sobble","water",1],[286,"變澀蜥","Drizzile","water",2],[287,"千面避役","Inteleon","water",3],[288,"涼脊龍","Frigibax","water",1],[289,"凍脊龍","Arctibax","water",1],[290,"戟脊龍","Baxcalibur","water",3],[291,"皮卡丘","Pikachu","lightning",1],[292,"雷丘","Raichu","lightning",3],[293,"小磁怪","Magnemite","lightning",1],[294,"三合一磁怪","Magneton","lightning",2],[295,"咩利羊","Mareep","lightning",1],[296,"茸茸羊","Flaaffy","lightning",2],[297,"落雷獸","Electrike","lightning",1],[298,"傘電蜥","Helioptile","lightning",1],[299,"光電傘蜥","Heliolisk","lightning",2],[300,"來電汪","Yamper","lightning",1],[301,"電音嬰","Toxel","lightning",1],[302,"光蚪仔","Tadbulb","lightning",1],[303,"鐵荊棘","Iron Thorns","lightning",2],[304,"拉魯拉絲","Ralts","psychic",1],[305,"奇魯莉安","Kirlia","psychic",2],[306,"小果然","Wynaut","psychic",3],[307,"鈴鐺響","Chingling","psychic",3],[308,"魔尼尼","Mime Jr.","psychic",3],[309,"美洛耶塔","Meloetta","psychic",2],[310,"仙子伊布","Sylveon","psychic",3],[311,"鑰圈兒","Klefki","psychic",3],[312,"狗仔包","Fidough","psychic",1],[313,"納噬草","Bramblin","psychic",1],[314,"怖納噬草","Brambleghast","psychic",3],[315,"索財靈","Gimmighoul","psychic",1],[316,"大岩蛇","Onix","fighting",1],[317,"大顎蟻","Trapinch","fighting",1],[318,"利歐路","Riolu","fighting",1],[319,"石丸子","Roggenrola","fighting",1],[320,"地幔岩","Boldore","fighting",2],[321,"石居蟹","Dwebble","fighting",1],[322,"岩狗狗","Rockruff","fighting",1],[323,"列陣兵","Falinks","fighting",2],[324,"阿羅拉 臭泥","Alolan Grimer","darkness",1],[325,"阿羅拉 臭臭泥","Alolan Muk","darkness",3],[326,"鬼斯","Gastly","darkness",1],[327,"鬼斯通","Haunter","darkness",2],[328,"達克萊伊","Darkrai","darkness",3],[329,"索羅亞","Zorua","darkness",1],[330,"垃垃藻","Skrelp","darkness",1],[331,"薩戮德","Zarude","darkness",3],[332,"下石鳥","Bombirdier","darkness",3],[333,"轟鳴月","Roaring Moon","darkness",3],[334,"伽勒爾 喵喵","Galarian Meowth","metal",1],[335,"喵頭目","Galarian Perrserker","metal",3],[336,"鐵啞鈴","Beldum","metal",1],[337,"金屬怪","Metang","metal",2],[338,"獨劍鞘","Honedge","metal",1],[339,"雙劍鞘","Doublade","metal",2],[340,"堅盾劍怪","Aegislash","metal",3],[341,"堅盾劍怪","Aegislash","metal",3],[342,"美錄坦","Meltan","metal",1],[343,"迷你龍","Dratini","dragon",1],[344,"哈克龍","Dragonair","dragon",2],[345,"超音波幼蟲","Vibrava","dragon",2],[346,"牙牙","Axew","dragon",1],[347,"斧牙龍","Fraxure","dragon",2],[348,"雙斧戰龍","Haxorus","dragon",3],[349,"老翁龍","Drampa","dragon",2],[350,"小拉達","Rattata","colorless",1],[351,"拉達","Raticate","colorless",3],[352,"喵喵","Meowth","colorless",1],[353,"伊布","Eevee","colorless",1],[354,"向尾喵","Skitty","colorless",1],[355,"優雅貓","Delcatty","colorless",3],[356,"青綿鳥","Swablu","colorless",1],[357,"捲捲耳","Buneary","colorless",1],[358,"小卡比獸","Munchlax","colorless",3],[359,"小約克","Lillipup","colorless",1],[360,"洗翠 索羅亞","Hisuian Zorua","colorless",1],[361,"鴨寶寶","Ducklett","colorless",1],[362,"稚山雀","Rookidee","colorless",1],[363,"藍鴉","Corvisquire","colorless",2],[364,"幸運冰棒","Lucky Ice Pop","item",2],[365,"電氣發生器","Electric Generator","item",2],[366,"點單板","Order Pad","item",2],[367,"速成精華","Quick-Grow Extract","item",2],[368,"場地吹風機","Field Blower","item",2],[369,"火焰補片","Flame Patch","item",2],[370,"詐欺之針","Deceptive Needle","tool",2],[371,"幸運蛋","Lucky Egg","tool",2],[372,"小氣球","Small Balloon","tool",2],[373,"驅勁能量 古代","Ancient Booster Energy Capsule","tool",2],[374,"驅勁能量 未來","Future Booster Energy Capsule","tool",2],[375,"防護斗篷","Protective Poncho","tool",2],[376,"金屬核心屏障","Metal Core Barrier","tool",2],[377,"優雅披風","Elegant Cape","tool",2],[378,"艾莉絲","Iris","supporter",2],[379,"葵","Juliana","supporter",2],[380,"卡露妮","Diantha","supporter",2],[381,"卡魯穆","Calem","supporter",2],[382,"愛狗的女孩","Puppy-Loving Girl","supporter",2],[383,"可爾妮","Korrina","supporter",2],[384,"希特隆","Clemont","supporter",2],[385,"莎莉娜","Serena","supporter",2],[386,"小遙","May","supporter",2],[387,"風露","Skyla","supporter",2],[388,"派帕","Arven","supporter",2],[389,"米可利","Wallace","supporter",2],[390,"滿充","Wally","supporter",2],[391,"模仿小姐","Copycat","supporter",2],[392,"露琪亞","Lisia","supporter",2],[393,"芬芳森林","Fragrant Forest","stadium",2],[394,"古代競技場","Arena of Antiquity","stadium",2],[395,"寧靜海岸","Soothing Shore","stadium",2],[396,"結界","Bounded Field","stadium",2],[397,"桌台市","Mesagoza","stadium",2],[398,"訓練場","Training Area","stadium",2],[399,"彩虹洞窟","Rainbow Cave","stadium",2],[400,"健行步道","Hiking Trail","stadium",2],[401,"起始平原","Starting Plains","stadium",2],[402,"奇妙廣場","Peculiar Plaza","stadium",2]];
+const RAW = [[237,"妙蛙種子","Bulbasaur","grass",1],[238,"妙蛙草","Ivysaur","grass",2],[239,"綠毛蟲","Caterpie","grass",1],[240,"鐵甲蛹","Metapod","grass",2],[241,"巴大蝶","Butterfree","grass",3],[242,"飛天螳螂","Scyther","grass",1],[243,"時拉比","Celebi","grass",3],[244,"木守宮","Treecko","grass",1],[245,"森林蜥蜴","Grovyle","grass",2],[246,"含羞苞","Budew","grass",3],[247,"三蜜蜂","Combee","grass",1],[248,"木棉球","Cottonee","grass",1],[249,"百合根娃娃","Petilil","grass",1],[250,"裙兒小姐","Lilligant","grass",3],[251,"鐵蟻","Durant","grass",1],[252,"新葉喵","Sprigatito","grass",1],[253,"蒂蕾喵","Floragato","grass",1],[254,"迷你芙","Smoliv","grass",1],[255,"奧利紐","Dolliv","grass",1],[256,"奧利瓦","Arboliva","grass",3],[257,"厄鬼椪碧草面具","Teal Mask Ogerpon","grass",3],[258,"小火龍","Charmander","fire",1],[259,"火恐龍","Charmeleon","fire",2],[260,"卡蒂狗","Growlithe","fire",1],[261,"小火馬","Ponyta","fire",1],[262,"火球鼠","Cyndaquil","fire",1],[263,"火岩鼠","Quilava","fire",2],[264,"火稚雞","Torchic","fire",1],[265,"力壯雞","Combusken","fire",2],[266,"呆火駝","Numel","fire",1],[267,"比克提尼","Victini","fire",3],[268,"呆火鱷","Fuecoco","fire",1],[269,"炙燙鱷","Crocalor","fire",1],[270,"骨紋巨聲鱷","Skeledirge","fire",3],[271,"炭小侍","Charcadet","fire",1],[272,"厄鬼椪火灶面具","Hearthflame Mask Ogerpon","fire",3],[273,"傑尼龜","Squirtle","water",1],[274,"卡咪龜","Wartortle","water",2],[275,"阿羅拉六尾","Alolan Vulpix","water",1],[276,"呆呆獸","Slowpoke","water",1],[277,"鯉魚王","Magikarp","water",1],[278,"水躍魚","Mudkip","water",1],[279,"沼躍魚","Marshtomp","water",2],[280,"利牙魚","Carvanha","water",1],[281,"吼吼鯨","Wailmer","water",1],[282,"醜醜魚","Feebas","water",1],[283,"呱呱泡蛙","Froakie","water",1],[284,"呱頭蛙","Frogadier","water",2],[285,"淚眼蜥","Sobble","water",1],[286,"變澀蜥","Drizzile","water",2],[287,"千面避役","Inteleon","water",3],[288,"涼脊龍","Frigibax","water",1],[289,"凍脊龍","Arctibax","water",1],[290,"戟脊龍","Baxcalibur","water",3],[291,"皮卡丘","Pikachu","lightning",1],[292,"雷丘","Raichu","lightning",3],[293,"小磁怪","Magnemite","lightning",1],[294,"三合一磁怪","Magneton","lightning",2],[295,"咩利羊","Mareep","lightning",1],[296,"茸茸羊","Flaaffy","lightning",2],[297,"落雷獸","Electrike","lightning",1],[298,"傘電蜥","Helioptile","lightning",1],[299,"光電傘蜥","Heliolisk","lightning",2],[300,"來電汪","Yamper","lightning",1],[301,"毒電嬰","Toxel","lightning",1],[302,"光蚪仔","Tadbulb","lightning",1],[303,"鐵荊棘","Iron Thorns","lightning",2],[304,"拉魯拉絲","Ralts","psychic",1],[305,"奇魯莉安","Kirlia","psychic",2],[306,"小果然","Wynaut","psychic",3],[307,"鈴鐺響","Chingling","psychic",3],[308,"魔尼尼","Mime Jr.","psychic",3],[309,"美洛耶塔","Meloetta","psychic",2],[310,"仙子伊布","Sylveon","psychic",3],[311,"鑰圈兒","Klefki","psychic",3],[312,"狗仔包","Fidough","psychic",1],[313,"納噬草","Bramblin","psychic",1],[314,"怖納噬草","Brambleghast","psychic",3],[315,"索財靈","Gimmighoul","psychic",1],[316,"大岩蛇","Onix","fighting",1],[317,"大顎蟻","Trapinch","fighting",1],[318,"利歐路","Riolu","fighting",1],[319,"石丸子","Roggenrola","fighting",1],[320,"地幔岩","Boldore","fighting",2],[321,"石居蟹","Dwebble","fighting",1],[322,"岩狗狗","Rockruff","fighting",1],[323,"列陣兵","Falinks","fighting",2],[324,"阿羅拉臭泥","Alolan Grimer","darkness",1],[325,"阿羅拉臭臭泥","Alolan Muk","darkness",3],[326,"鬼斯","Gastly","darkness",1],[327,"鬼斯通","Haunter","darkness",2],[328,"達克萊伊","Darkrai","darkness",3],[329,"索羅亞","Zorua","darkness",1],[330,"垃垃藻","Skrelp","darkness",1],[331,"薩戮德","Zarude","darkness",3],[332,"下石鳥","Bombirdier","darkness",3],[333,"轟鳴月","Roaring Moon","darkness",3],[334,"伽勒爾喵喵","Galarian Meowth","metal",1],[335,"伽勒爾喵頭目","Galarian Perrserker","metal",3],[336,"鐵啞鈴","Beldum","metal",1],[337,"金屬怪","Metang","metal",2],[338,"獨劍鞘","Honedge","metal",1],[339,"雙劍鞘","Doublade","metal",2],[340,"堅盾劍怪","Aegislash","metal",3],[341,"堅盾劍怪","Aegislash","metal",3],[342,"美錄坦","Meltan","metal",1],[343,"迷你龍","Dratini","dragon",1],[344,"哈克龍","Dragonair","dragon",2],[345,"超音波幼蟲","Vibrava","dragon",2],[346,"牙牙","Axew","dragon",1],[347,"斧牙龍","Fraxure","dragon",2],[348,"雙斧戰龍","Haxorus","dragon",3],[349,"老翁龍","Drampa","dragon",2],[350,"小拉達","Rattata","colorless",1],[351,"拉達","Raticate","colorless",3],[352,"喵喵","Meowth","colorless",1],[353,"伊布","Eevee","colorless",1],[354,"向尾喵","Skitty","colorless",1],[355,"優雅貓","Delcatty","colorless",3],[356,"青綿鳥","Swablu","colorless",1],[357,"捲捲耳","Buneary","colorless",1],[358,"小卡比獸","Munchlax","colorless",3],[359,"小約克","Lillipup","colorless",1],[360,"洗翠索羅亞","Hisuian Zorua","colorless",1],[361,"鴨寶寶","Ducklett","colorless",1],[362,"稚山雀","Rookidee","colorless",1],[363,"藍鴉","Corvisquire","colorless",2],[364,"可抽獎的冰棒","Lucky Ice Pop","item",2],[365,"電氣發生器","Electric Generator","item",2],[366,"訂購平板","Order Pad","item",2],[367,"早熟精華","Quick-Grow Extract","item",2],[368,"場地吹風機","Field Blower","item",2],[369,"火補丁","Flame Patch","item",2],[370,"耍詐針","Deceptive Needle","tool",2],[371,"幸運蛋","Lucky Egg","tool",2],[372,"小氣球","Small Balloon","tool",2],[373,"驅勁能量 古代","Ancient Booster Energy Capsule","tool",2],[374,"驅勁能量 未來","Future Booster Energy Capsule","tool",2],[375,"守護披風","Protective Poncho","tool",2],[376,"金屬核心屏障","Metal Core Barrier","tool",2],[377,"優雅斗篷","Elegant Cape","tool",2],[378,"艾莉絲","Iris","supporter",2],[379,"小青","Juliana","supporter",2],[380,"卡露妮","Diantha","supporter",2],[381,"卡魯穆","Calem","supporter",2],[382,"超愛小狗的女孩","Puppy-Loving Girl","supporter",2],[383,"可爾妮","Korrina","supporter",2],[384,"希特隆","Clemont","supporter",2],[385,"莎莉娜","Serena","supporter",2],[386,"小遙","May","supporter",2],[387,"風露","Skyla","supporter",2],[388,"派帕","Arven","supporter",2],[389,"米可利","Wallace","supporter",2],[390,"滿充","Wally","supporter",2],[391,"模仿少女","Copycat","supporter",2],[392,"琉琪亞","Lisia","supporter",2],[393,"甜薰森林","Fragrant Forest","stadium",2],[394,"古老鬥技場","Arena of Antiquity","stadium",2],[395,"療癒海邊","Soothing Shore","stadium",2],[396,"結界場地","Bounded Field","stadium",2],[397,"桌台市","Mesagoza","stadium",2],[398,"訓練區","Training Area","stadium",2],[399,"虹色洞窟","Rainbow Cave","stadium",2],[400,"健行步道","Hiking Trail","stadium",2],[401,"起始平原","Starting Plains","stadium",2],[402,"神奇廣場","Peculiar Plaza","stadium",2]];
 const TYPES = {
   grass:['草','#4E9F48'], fire:['火','#DE5236'], water:['水','#3A84CF'], lightning:['雷','#CF9C0E'],
   psychic:['超','#9853BC'], fighting:['鬥','#B4663A'], darkness:['惡','#3B4656'], metal:['鋼','#7C8996'],
@@ -349,7 +398,7 @@ const S = {
   players:new Map(), order:[], logs:[], trades:[], logF:'all', loaded:false,
   me:null, view: lsGet('b4b-view'), tab:'mine', openCard:null,
   f:{ q:'', status:'all', groups:new Set(), rar:new Set() },
-  includeLast:false, mineOnly:true, sugs:[]
+  includeLast:false, mineOnly:true, sugs:[], trWho:'', gfWho:'', gfMine:true, gifts:[], cols: lsGet('b4b-cols')||'auto'
 };
 const pending = new Map();
 
@@ -364,10 +413,12 @@ const pname = id => S.players.get(id)?.name ?? '（已移除的玩家）';
 const unlockers = n => all().filter(p=>E(p,n));
 const spareOf = (p,n) => Math.max(0, C(p,n) - (S.includeLast ? 0 : 1));
 
-function art(c, cls=''){
+// 圖片載入失敗時依序改用下一個來源，全部失敗才顯示屬性色卡
+window.imgFail = el => { const q=(el.dataset.fb||'').split('|').filter(Boolean); if(q.length){ el.dataset.fb=q.slice(1).join('|'); el.src=q[0]; } else el.remove(); };
+function art(c, cls='', big=false){
   return `<span class="art ${cls}" style="--tc:${TYPES[c.type][1]}">
     <span class="ph"><b>${esc(c.zh)}</b><span>#${c.n} ${TYPES[c.type][0]}</span></span>
-    <img src="${IMAGE_URL(c.n)}" alt="" loading="lazy" decoding="async" onerror="this.remove()">
+    <img src="${IMAGE_URLS[0](c.n,big)}" data-fb="${IMAGE_URLS.slice(1).map(f=>f(c.n,big)).join('|')}" alt="" loading="lazy" decoding="async" onerror="imgFail(this)">
   </span>`;
 }
 let toastT;
@@ -712,6 +763,8 @@ function match(c){
 let lastList='';
 function renderGrid(){
   const g=$('#grid');
+  g.classList.toggle('cols-3',S.cols==='3'); g.classList.toggle('cols-5',S.cols==='5');
+  document.querySelectorAll('#colSeg [data-cols]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cols===S.cols));
   g.classList.toggle('readonly',!canEdit());
   $('#roNote').hidden = canEdit() || !viewP();
   if (!viewP()){ g.innerHTML='<div class="empty" style="grid-column:1/-1">還沒有任何玩家。請管理員建立帳號，大家登入後就會出現在這裡。</div>'; lastList=''; $('#resultTxt').textContent=''; return; }
@@ -748,7 +801,7 @@ function renderCard(){
   $('#cardBody').innerHTML = `
     <div class="dlg-head"><h3>#${c.n} ${esc(c.zh)}</h3><button class="x" type="button" data-close aria-label="關閉">✕</button></div>
     <div class="detail">
-      <div class="${C(v,n)>0?'s-own':E(v,n)?'s-zero':'s-never'}">${art(c)}</div>
+      <div class="${C(v,n)>0?'s-own':E(v,n)?'s-zero':'s-never'}">${art(c,'',true)}</div>
       <div class="info">
         <div class="en">${esc(c.en)}</div>
         <div>${TYPES[c.type][0]}　<span class="rar" style="font-size:13px">${dia(c.rar)}</span>　平行閃卡</div>
@@ -798,37 +851,50 @@ function renderTeam(){
 $('#tab-team').addEventListener('click',e=>{ const b=e.target.closest('[data-open]'); if(b) openCard(Number(b.dataset.open)); });
 
 /* ================= 交換建議 ================= */
-function computeSugs(){
-  const ps=all(); if (ps.length<2) return [];
+// 模擬器：在副本上推演，避免同一張多餘的卡被重複推薦
+function sim(ps){
   const cnt=new Map(), ev=new Map(), K=(p,n)=>p.id+'|'+n;
   for (const p of ps) for (const c of CARDS){ cnt.set(K(p,c.n),C(p,c.n)); ev.set(K(p,c.n),E(p,c.n)); }
-  const sp=(p,n)=>cnt.get(K(p,n))-(S.includeLast?0:1);
-  const need=(p,n)=>!ev.get(K(p,n));
-  const move=(a,b,n)=>{ cnt.set(K(a,n),cnt.get(K(a,n))-1); cnt.set(K(b,n),cnt.get(K(b,n))+1); ev.set(K(b,n),true); };
-  const scarce=n=>ps.filter(p=>ev.get(K(p,n))).length;
-  const out=[];
-  for (const r of [3,2,1]){
+  return {
+    sp:(p,n)=>cnt.get(K(p,n))-(S.includeLast?0:1),
+    need:(p,n)=>!ev.get(K(p,n)),
+    move:(a,b,n)=>{ cnt.set(K(a,n),cnt.get(K(a,n))-1); cnt.set(K(b,n),cnt.get(K(b,n))+1); ev.set(K(b,n),true); },
+    scarce:n=>all().filter(p=>ev.get(K(p,n))).length
+  };
+}
+const RAR_ASC=[1,2,3], RAR_DESC=[3,2,1];
+const rarName = r => ['','一菱','二菱','三菱'][r];
+// 交換：只配「雙方都解鎖新卡」，低稀有度優先
+function computeTrades(ps){
+  if (ps.length<2) return [];
+  const s=sim(all()), out=[];
+  for (const r of RAR_ASC){
     const pool=CARDS.filter(c=>c.rar===r);
     for (let i=0;i<ps.length;i++) for (let j=i+1;j<ps.length;j++){
       const A=ps[i], B=ps[j];
       for(;;){
-        const X=pool.filter(c=>sp(A,c.n)>0&&need(B,c.n)).sort((a,b)=>scarce(a.n)-scarce(b.n));
-        const Y=pool.filter(c=>sp(B,c.n)>0&&need(A,c.n)).sort((a,b)=>scarce(a.n)-scarce(b.n));
+        const by=(a,b)=>s.scarce(a.n)-s.scarce(b.n)||a.n-b.n;
+        const X=pool.filter(c=>s.sp(A,c.n)>0&&s.need(B,c.n)).sort(by);
+        const Y=pool.filter(c=>s.sp(B,c.n)>0&&s.need(A,c.n)).sort(by);
         if (!X.length||!Y.length) break;
-        move(A,B,X[0].n); move(B,A,Y[0].n);
-        out.push({kind:'mutual',a:A.id,b:B.id,x:X[0].n,y:Y[0].n});
+        s.move(A,B,X[0].n); s.move(B,A,Y[0].n);
+        out.push({a:A.id,b:B.id,x:X[0].n,y:Y[0].n,r});
       }
     }
   }
-  const order=CARDS.slice().sort((a,b)=>scarce(a.n)-scarce(b.n)||b.rar-a.rar);
+  return out;
+}
+// 贈送：高稀有度優先，同稀有度先處理解鎖人數最少的卡；由多餘張數最多的人送
+function computeGifts(){
+  const ps=all(); if (ps.length<2) return [];
+  const s=sim(ps), out=[];
+  const order=CARDS.slice().sort((a,b)=>b.rar-a.rar||s.scarce(a.n)-s.scarce(b.n)||a.n-b.n);
   for (const c of order) for (const B of ps){
-    if (!need(B,c.n)) continue;
-    const givers=ps.filter(p=>p!==B&&sp(p,c.n)>0).sort((a,b)=>sp(b,c.n)-sp(a,c.n));
+    if (!s.need(B,c.n)) continue;
+    const givers=ps.filter(p=>p!==B&&s.sp(p,c.n)>0).sort((a,b)=>s.sp(b,c.n)-s.sp(a,c.n));
     if (!givers.length) continue;
-    const A=givers[0]; move(A,B,c.n);
-    const back=CARDS.filter(d=>d.rar===c.rar&&d.n!==c.n&&sp(B,d.n)>0).sort((a,b)=>(need(A,b.n)-need(A,a.n))||(sp(B,b.n)-sp(B,a.n)));
-    const y=back[0]?.n ?? null; if (y!=null) move(B,A,y);
-    out.push({kind:'help',a:A.id,b:B.id,x:c.n,y});
+    s.move(givers[0],B,c.n);
+    out.push({a:givers[0].id,b:B.id,x:c.n,r:c.rar});
   }
   return out;
 }
@@ -836,32 +902,108 @@ function leg(from,to,n,extra=''){
   const c=BYN.get(n);
   return `<div class="leg">${art(c)}<span><b>${esc(pname(from))}</b> 給 <b>${esc(pname(to))}</b>：#${c.n} ${esc(c.zh)} <span class="rar">${dia(c.rar)}</span>${extra}</span></div>`;
 }
-function sugAction(s,i){
-  if (s.a===S.me || s.b===S.me) return `<button class="btn" data-sug="${i}">照這個建議記錄交換（可修改）</button>`;
-  return `<span class="wait">由${esc(pname(s.a))}或${esc(pname(s.b))}發起記錄。</span>`;
+const persp = () => me() || viewP();
+function fillWho(sel,val,first,exclude){
+  const os=all().filter(p=>p!==exclude);
+  sel.innerHTML=`<option value="">${first}</option>`+os.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.id===S.me?'（我）':''}</option>`).join('');
+  if (!os.some(p=>p.id===val)) val='';
+  sel.value=val; return val;
 }
+function rhead(r,extra=''){ return `<div class="rhead"><h2>${rarName(r)}</h2><span class="rar">${dia(r)}</span>${extra}</div>`; }
+
+/* ---------- 交換建議 ---------- */
 function renderTrade(){
-  const all_=computeSugs();
-  S.sugs = all_.filter(s=>!S.mineOnly||!S.me||s.a===S.me||s.b===S.me);
-  const box=$('#sugList');
+  const box=$('#sugList'), P=persp();
+  S.trWho = fillWho($('#trWho'), S.trWho, '全隊（自動配對）', P);
+  $('#trMineWrap').hidden = !!S.trWho || !S.me;
   if (all().length<2){ box.innerHTML='<div class="empty">至少要有兩位玩家登記，才能產生交換建議。</div>'; return; }
-  if (!S.sugs.length){ box.innerHTML=`<div class="empty">${all_.length?'目前沒有跟你有關的建議。取消勾選「只看跟我有關的」可以看全隊的配對。':'目前沒有可行的交換。等大家多開幾包、登記更多張數再回來看。'}</div>`; return; }
-  box.innerHTML = S.sugs.map((s,i)=>{
-    const c=BYN.get(s.x);
-    if (s.kind==='mutual') return `<div class="sug"><span class="kind">雙方都解鎖新卡</span>${leg(s.a,s.b,s.x)}${leg(s.b,s.a,s.y)}${sugAction(s,i)}</div>`;
-    return `<div class="sug help"><span class="kind">幫 ${esc(pname(s.b))} 解鎖</span>${leg(s.a,s.b,s.x)}${
-      s.y!=null ? leg(s.b,s.a,s.y,' <span class="note">（回換用的多餘卡）</span>')
-      : `<div class="leg"><span></span><span class="note">${esc(pname(s.b))} 需要回一張 ${dia(c.rar)} 的卡，但目前沒有多的，可用手上其他同稀有度的卡。</span></div>`
-    }${sugAction(s,i)}</div>`;
+  if (S.trWho) return renderPair(box,P,S.players.get(S.trWho));
+  const list=computeTrades(all());
+  S.sugs = list.filter(s=>!S.mineOnly||!S.me||s.a===S.me||s.b===S.me);
+  if (!S.sugs.length){ box.innerHTML=`<div class="empty">${list.length?'目前沒有跟你有關的建議。取消勾選「只看跟我有關的」可以看全隊的配對，或在「對象」選一個人看所有可換的卡。':'目前沒有雙方都能解鎖的交換。可以在「對象」選一個人看所有可換的卡，或到「贈送建議」看看。'}</div>`; return; }
+  box.innerHTML = RAR_ASC.map(r=>{
+    const g=S.sugs.map((s,i)=>[s,i]).filter(([s])=>s.r===r); if(!g.length) return '';
+    return rhead(r,`<small>${g.length} 組</small>`)+g.map(([s,i])=>`<div class="sug"><span class="kind">雙方都解鎖新卡</span>${leg(s.a,s.b,s.x)}${leg(s.b,s.a,s.y)}${
+      (s.a===S.me||s.b===S.me)?`<button class="btn" data-sug="${i}">照這個建議記錄交換（可修改）</button>`:`<span class="wait">由${esc(pname(s.a))}或${esc(pname(s.b))}發起記錄。</span>`}</div>`).join('');
   }).join('');
 }
-$('#sugList').addEventListener('click',async e=>{
+function pickList(owner,other,cards,side,can){
+  if (!cards.length) return '<div class="empty" style="padding:12px;font-size:13px">沒有</div>';
+  return `<div class="pick free">${cards.map(c=>`<button type="button" data-pv="${side}" data-n="${c.n}" ${can?'':'disabled'}>${art(c)}
+    <span>#${c.n} ${esc(c.zh)}<br><small style="color:var(--muted)">${esc(owner.name)}有 ${C(owner,c.n)} 張</small></span>
+    ${!E(other,c.n)?`<span class="need">${esc(other.name)}未解鎖</span>`:''}</button>`).join('')}</div>`;
+}
+function renderPair(box,P,X){
+  if (!P){ box.innerHTML='<div class="empty">請先登入。</div>'; return; }
+  const can = P.id===S.me;
+  const auto=computeTrades([P,X]).filter(s=>true);
+  S.sugs=auto;
+  let html = `<p class="lead" style="margin-top:0">${esc(P.name)} 和 ${esc(X.name)} 之間可以交換的卡。${can?'點任一張卡會開啟交換視窗，可以自由搭配同稀有度的卡。':'登入本人帳號後才能記錄交換。'}</p>`;
+  if (auto.length) html += `<div class="rhead"><h2>建議配對</h2><small>${auto.length} 組，雙方都解鎖新卡</small></div>`+auto.map((s,i)=>`<div class="sug"><span class="kind">${rarName(s.r)}</span>${leg(s.a,s.b,s.x)}${leg(s.b,s.a,s.y)}${can?`<button class="btn" data-sug="${i}">照這個配對記錄交換（可修改）</button>`:''}</div>`).join('');
+  for (const r of RAR_ASC){
+    const give=CARDS.filter(c=>c.rar===r&&spareOf(P,c.n)>0).sort((a,b)=>E(X,a.n)-E(X,b.n)||a.n-b.n);
+    const get=CARDS.filter(c=>c.rar===r&&spareOf(X,c.n)>0).sort((a,b)=>E(P,a.n)-E(P,b.n)||a.n-b.n);
+    const ng=give.filter(c=>!E(X,c.n)).length, nt=get.filter(c=>!E(P,c.n)).length;
+    html += rhead(r,`<small>${esc(X.name)}可解鎖 ${ng} 張，${esc(P.name)}可解鎖 ${nt} 張</small>`)+`<div class="pv-cols">
+      <div class="pv-col"><h3>${esc(P.name)}多的卡（給 ${esc(X.name)}）</h3>${pickList(P,X,give,'give',can)}</div>
+      <div class="pv-col"><h3>${esc(X.name)}多的卡（給 ${esc(P.name)}）</h3>${pickList(X,P,get,'get',can)}</div></div>`;
+  }
+  box.innerHTML=html;
+}
+$('#sugList').addEventListener('click',e=>{
+  const pv=e.target.closest('[data-pv]');
+  if (pv){ const n=Number(pv.dataset.n); return openTx({mode:'trade',to:S.trWho,[pv.dataset.pv]:n}); }
   const b=e.target.closest('[data-sug]'); if(!b) return; const s=S.sugs[Number(b.dataset.sug)]; if(!s) return;
   if (s.a===S.me) openTx({mode:'trade',to:s.b,give:s.x,get:s.y});
   else openTx({mode:'trade',to:s.a,give:s.y,get:s.x});
 });
+$('#trWho').addEventListener('change',e=>{ S.trWho=e.target.value; renderTrade(); });
 $('#optMine').addEventListener('change',e=>{ S.mineOnly=e.target.checked; renderTrade(); });
-$('#optLast').addEventListener('change',e=>{ S.includeLast=e.target.checked; refresh(); });
+
+/* ---------- 贈送建議 ---------- */
+function renderGift(){
+  const box=$('#giftList');
+  S.gfWho = fillWho($('#gfWho'), S.gfWho, '全隊（自動分配）', null);
+  $('#gfMineWrap').hidden = !!S.gfWho || !S.me;
+  if (all().length<2){ box.innerHTML='<div class="empty">至少要有兩位玩家登記，才能產生贈送建議。</div>'; return; }
+  if (S.gfWho) return renderNeeds(box,S.players.get(S.gfWho));
+  const list=computeGifts();
+  S.gifts = list.filter(g=>!S.gfMine||!S.me||g.a===S.me);
+  if (!S.gifts.length){ box.innerHTML=`<div class="empty">${list.length?'目前沒有你能送的卡。取消勾選「只看我能送的」可以看全隊的分配。':'目前沒有可以贈送的卡：還沒解鎖的卡，其他人也都沒有多的。'}</div>`; return; }
+  box.innerHTML = RAR_DESC.map(r=>{
+    const g=S.gifts.map((x,i)=>[x,i]).filter(([x])=>x.r===r); if(!g.length) return '';
+    return rhead(r,`<small>${g.length} 筆</small>`)+g.map(([x,i])=>`<div class="sug help">${leg(x.a,x.b,x.x,`（${esc(pname(x.b))}新解鎖）`)}${
+      x.a===S.me?`<button class="btn" data-gift="${i}">已在遊戲中送出，記錄贈送</button>`:`<span class="wait">由${esc(pname(x.a))}記錄。</span>`}</div>`).join('');
+  }).join('');
+}
+function renderNeeds(box,X){
+  const m=me(), isMe=X===m;
+  const miss=CARDS.filter(c=>!E(X,c.n));
+  if (!miss.length){ box.innerHTML=`<div class="empty">${esc(X.name)}已經解鎖全部 ${TOTAL} 張了。</div>`; return; }
+  let html=`<p class="lead" style="margin-top:0">${isMe?'你':esc(X.name)}還沒解鎖 ${miss.length} 張。綠字是有多餘張數、可以送出的人。</p>`;
+  for (const r of RAR_DESC){
+    const cs=miss.filter(c=>c.rar===r); if(!cs.length) continue;
+    const rows=cs.map(c=>({c,givers:othersOf(X).filter(p=>spareOf(p,c.n)>0).sort((a,b)=>C(b,c.n)-C(a,c.n)),any:unlockers(c.n).length}))
+      .sort((a,b)=>(b.givers.length>0)-(a.givers.length>0)||a.c.n-b.c.n);
+    html+=rhead(r,`<small>缺 ${cs.length} 張，其中 ${rows.filter(x=>x.givers.length).length} 張有人能送</small>`)+rows.map(({c,givers,any})=>{
+      const canGive = m && !isMe && spareOf(m,c.n)>0;
+      const who = givers.length ? `可以送：${givers.map(p=>esc(p.name)+' ×'+C(p,c.n)).join('、')}` : any ? '有人解鎖過，但目前沒人有多的' : '全隊都沒有';
+      return `<div class="grow">${art(c)}<span><span class="t1">#${c.n} ${esc(c.zh)}</span><br><span class="t2 ${givers.length?'':any?'none':'team'}">${who}</span></span>${
+        canGive?`<button class="btn small" data-need="${c.n}">我送${esc(X.name)}</button>`:''}</div>`;
+    }).join('');
+  }
+  box.innerHTML=html;
+}
+$('#giftList').addEventListener('click',e=>{
+  const g=e.target.closest('[data-gift]'); if (g){ const x=S.gifts[Number(g.dataset.gift)]; if(x) openTx({mode:'gift',to:x.b,give:x.x}); return; }
+  const n=e.target.closest('[data-need]'); if (n) openTx({mode:'gift',to:S.gfWho,give:Number(n.dataset.need)});
+});
+$('#gfWho').addEventListener('change',e=>{ S.gfWho=e.target.value; renderGift(); });
+$('#gfMine').addEventListener('change',e=>{ S.gfMine=e.target.checked; renderGift(); });
+document.querySelectorAll('.optLast').forEach(cb=>cb.addEventListener('change',e=>{
+  S.includeLast=e.target.checked; document.querySelectorAll('.optLast').forEach(x=>x.checked=S.includeLast); refresh();
+}));
+$('#colSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-cols]'); if(!b) return; S.cols=b.dataset.cols; lsSet('b4b-cols',S.cols); renderGrid(); });
 
 /* ================= 紀錄 ================= */
 const fmt=new Intl.DateTimeFormat('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -1050,7 +1192,7 @@ $('#logoutBtn').addEventListener('click',async()=>{ await flush(); await store.s
 function setTab(tab,quiet){
   S.tab=tab;
   document.querySelectorAll('.tabs [data-tab]').forEach(x=>x.setAttribute('aria-selected',x.dataset.tab===tab));
-  for (const t of ['mine','team','trade','log']) $('#tab-'+t).hidden = t!==tab;
+  for (const t of ['mine','team','trade','gift','log']) $('#tab-'+t).hidden = t!==tab;
   if (!quiet) refresh(); scrollTo({top:0});
 }
 document.querySelector('.tabs').addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(b) setTab(b.dataset.tab); });
@@ -1059,6 +1201,7 @@ function refresh(){
   if (S.tab==='mine') renderGrid();
   if (S.tab==='team') renderTeam();
   if (S.tab==='trade') renderTrade();
+  if (S.tab==='gift') renderGift();
   if (S.tab==='log') renderLog();
   if (S.openCard!=null) renderCard();
 }
