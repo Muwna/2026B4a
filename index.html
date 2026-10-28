@@ -243,6 +243,35 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 .grow .t2.none{color:var(--muted)}
 .grow .t2.team{color:var(--missing)}
 @media (max-width:460px){.grow{grid-template-columns:44px 1fr}.grow .btn{grid-column:1/-1}}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:13px;color:var(--muted);margin:-4px 0 12px}
+.legend span{display:inline-block;min-width:28px;text-align:center;padding:2px 6px;border-radius:6px;background:var(--sleeve);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);font-weight:500}
+.mx-wrap{overflow:auto;max-height:72vh;border-radius:12px;box-shadow:inset 0 0 0 1px var(--line);background:var(--sleeve)}
+.mx{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.mx th,.mx td{padding:6px 7px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.mx thead th{position:sticky;top:0;background:var(--sleeve);z-index:2;font-weight:500;color:var(--muted);font-size:12px;box-shadow:0 1px 0 var(--line)}
+.mx thead th.me{color:var(--violet);font-weight:700}
+.mx .cc{position:sticky;left:0;background:var(--sleeve);z-index:1;text-align:left;box-shadow:1px 0 0 var(--line)}
+.mx thead .cc{z-index:3}
+.mx .cc button{all:unset;cursor:pointer;display:grid;grid-template-columns:28px auto;gap:8px;align-items:center}
+.mx .cc button:focus-visible{outline:3px solid var(--violet);outline-offset:2px;border-radius:4px}
+.mx .cc .art{width:28px;border-radius:3px}
+.mx .cc .ph *{display:none}
+.mx .cc b{font-weight:500;display:block;max-width:7em;overflow:hidden;text-overflow:ellipsis}
+.mx .cc small{color:var(--violet);font-size:10px;letter-spacing:-1px}
+.mx td.c-miss,.legend .c-miss{background:var(--missing-soft);color:var(--missing);font-weight:700}
+.mx td.c-zero,.legend .c-zero{color:var(--muted)}
+.mx td.c-spare,.legend .c-spare{background:#E1F3EA;color:var(--ok);font-weight:700}
+.mx td.num{font-family:var(--round);font-size:14px}
+.mx .st-none{color:var(--missing);font-weight:700}
+.mx .st-done{color:var(--muted)}
+.mx .st-give{color:var(--ok);font-weight:500}
+.mx .st-stuck{color:#A86200}
+.giftrow{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:start;background:var(--sleeve);border-radius:10px;padding:8px;box-shadow:inset 0 0 0 1px var(--line);margin-bottom:8px}
+.giftrow .art{border-radius:5px}.giftrow .ph *{display:none}
+.giftrow .t1{font-weight:500}
+.giftrow .miss{font-size:13px;color:var(--missing)}
+.giftrow .has{font-size:13px;color:var(--ok)}
+.giftrow .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;max-width:90vw;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
 #toast.on{opacity:1}
 </style>
@@ -258,7 +287,7 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
   </div>
   <nav class="tabs" role="tablist">
     <button role="tab" data-tab="mine" aria-selected="true">我的登記</button>
-    <button role="tab" data-tab="team" aria-selected="false">全隊進度</button>
+    <button role="tab" data-tab="team" aria-selected="false">全隊圖鑑</button>
     <button role="tab" data-tab="trade" aria-selected="false">交換建議</button>
     <button role="tab" data-tab="gift" aria-selected="false">贈送建議</button>
     <button role="tab" data-tab="log" aria-selected="false">紀錄<span class="tbadge" id="logBadge" hidden></span></button>
@@ -286,29 +315,34 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
     <div class="stats" id="teamStats"></div>
     <h2>每個人的圖鑑進度</h2>
     <div class="plist" id="teamPlayers"></div>
-    <h2>全隊都沒有的卡</h2>
-    <p class="lead">這些卡目前沒有任何人解鎖過，只能靠開包或其他管道取得。</p>
-    <div class="mini-grid" id="teamMissing"></div>
-    <h2>還有人沒解鎖的卡</h2>
-    <p class="lead">依缺的人數排序。綠字是有多餘張數、可以送出的人。點一下可以看詳情並記錄贈送。</p>
-    <div class="need" id="teamNeeds"></div>
+    <h2>逐張狀況</h2>
+    <p class="lead">每張卡目前在每個人手上的張數。點卡名可以看詳情、記錄贈送或交換。</p>
+    <div class="legend"><span class="c-miss">缺</span>還沒解鎖<span class="c-zero">0</span>解鎖過但已送走<span>1</span>持有 1 張<span class="c-spare">2</span>有多的</div>
+    <div class="filters">
+      <input class="search" id="tq" type="search" placeholder="搜尋中文、英文名稱或編號" autocomplete="off">
+      <div class="chips" id="tSt"><span class="lbl">狀態</span></div>
+      <div class="chips" id="tRar"><span class="lbl">稀有度</span></div>
+      <div class="chips" id="tSort"><span class="lbl">排序</span></div>
+    </div>
+    <p class="result" id="tResult"></p>
+    <div class="mx-wrap"><table class="mx" id="mx"></table></div>
   </section>
 
   <section id="tab-trade" hidden>
-    <p class="lead">遊戲內交換需要同稀有度、一換一。這裡只列出雙方都能解鎖新卡的配對，從低稀有度開始排。選擇對象可以看你和他之間所有可換的卡，自己決定怎麼換。</p>
+    <p class="lead">遊戲內交換需要同稀有度、一換一。這裡依每個人目前的持有狀況，列出雙方都能解鎖新卡的配對，從低稀有度開始排。同一張多的卡可能出現在好幾組配對裡，完成一筆後清單會自動更新。選擇對象可以看你和他之間所有可換的卡。</p>
     <div class="ctl">
       <label>對象 <select id="trWho"></select></label>
-      <label id="trMineWrap"><input type="checkbox" id="optMine" checked> 只看跟我有關的</label>
+      <label id="trMineWrap"><input type="checkbox" id="optMine"> 只看跟我有關的</label>
       <label><input type="checkbox" class="optLast"> 只有 1 張的卡也可以送出</label>
     </div>
     <div id="sugList"></div>
   </section>
 
   <section id="tab-gift" hidden>
-    <p class="lead">從高稀有度開始，列出誰可以把多的卡送給還沒解鎖的人。選擇對象可以看他還缺哪些卡、誰能送。</p>
+    <p class="lead">依每個人目前的持有狀況，從高稀有度開始，列出每張卡誰還沒解鎖、誰有多的可以送。選擇收卡的人，可以看他還缺哪些卡。</p>
     <div class="ctl">
       <label>收卡的人 <select id="gfWho"></select></label>
-      <label id="gfMineWrap"><input type="checkbox" id="gfMine" checked> 只看我能送的</label>
+      <label id="gfMineWrap"><input type="checkbox" id="gfMine"> 只看我能送的</label>
       <label><input type="checkbox" class="optLast"> 只有 1 張的卡也可以送出</label>
     </div>
     <div id="giftList"></div>
@@ -406,7 +440,9 @@ const S = {
   players:new Map(), order:[], logs:[], trades:[], logF:'all', loaded:false,
   me:null, view: lsGet('b4b-view'), tab:'mine', openCard:null,
   f:{ q:'', status:'all', groups:new Set(), rar:new Set() },
-  includeLast:false, mineOnly:true, sugs:[], trWho:'', gfWho:'', gfMine:true, gifts:[], cols: lsGet('b4b-cols')||'auto'
+  includeLast: lsGet('b4b-last')==='1', mineOnly: lsGet('b4b-trmine')!=='0', gfMine: lsGet('b4b-gfmine')!=='0',
+  trWho: lsGet('b4b-trwho')||'', gfWho: lsGet('b4b-gfwho')||'', sugs:[], gifts:[], cols: lsGet('b4b-cols')||'auto',
+  t:{ q:'', st:'all', rar:new Set(), sort:'n' }
 };
 const pending = new Map();
 
@@ -834,77 +870,93 @@ $('#cardDlg').addEventListener('click', async e=>{
 $('#cardDlg').addEventListener('change',e=>{ if(e.target.id==='everBox'){ const p=me(), n=S.openCard; setMine(n,C(p,n),e.target.checked); } });
 $('#cardDlg').addEventListener('close',()=>{ S.openCard=null; });
 
-/* ================= 全隊進度 ================= */
+/* ================= 全隊圖鑑 ================= */
+const TST=[['all','全部'],['none','全隊都沒有'],['short','有人缺'],['give','缺的人有機會拿到'],['stuck','有人缺、沒人多'],['done','全員已解鎖']];
+const TSORT=[['n','編號'],['miss','缺的人多優先'],['few','全隊張數少優先']];
+function cardStat(c,ps){
+  const miss=ps.filter(p=>!E(p,c.n));
+  return { c, miss, ul:ps.length-miss.length, spare:ps.filter(p=>spareOf(p,c.n)>0), total:ps.reduce((s,p)=>s+C(p,c.n),0) };
+}
+function statusOf(x){
+  if (!x.ul) return ['全隊沒有','st-none'];
+  if (!x.miss.length) return ['全員解鎖','st-done'];
+  return x.spare.length ? [`缺${x.miss.length}，可送`,'st-give'] : [`缺${x.miss.length}，沒人多`,'st-stuck'];
+}
+function initTeamFilters(){
+  const mk=(id,list,cur,key)=>{ const w=$(id); for (const [v,l] of list){ const b=document.createElement('button'); b.className='chip'+(v==='none'?' warn':''); b.type='button'; b.dataset.v=v; b.textContent=l; b.setAttribute('aria-pressed',v===cur); w.append(b); }
+    w.addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; S.t[key]=b.dataset.v; w.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b)); renderTeam(); }); };
+  mk('#tSt',TST,'all','st'); mk('#tSort',TSORT,'n','sort');
+  const fr=$('#tRar');
+  for (const r of [1,2,3]){ const b=document.createElement('button'); b.className='chip'; b.type='button'; b.dataset.v=r; b.textContent=dia(r); b.setAttribute('aria-label',r+' 菱'); b.setAttribute('aria-pressed','false'); fr.append(b); }
+  fr.addEventListener('click',e=>{ const b=e.target.closest('.chip'); if(!b) return; const v=Number(b.dataset.v); S.t.rar.has(v)?S.t.rar.delete(v):S.t.rar.add(v); b.setAttribute('aria-pressed',S.t.rar.has(v)); renderTeam(); });
+  $('#tq').addEventListener('input',e=>{ S.t.q=e.target.value.trim().toLowerCase(); renderTeam(); });
+}
 function renderTeam(){
   const ps=all();
-  const union=CARDS.filter(c=>unlockers(c.n).length>0).length;
-  const none=CARDS.filter(c=>unlockers(c.n).length===0);
+  const stats=CARDS.map(c=>cardStat(c,ps));
+  const union=stats.filter(x=>x.ul>0).length, none=stats.filter(x=>!x.ul).length;
   const full=ps.filter(p=>CARDS.every(c=>E(p,c.n))).length;
   $('#teamStats').innerHTML=`
     <div class="stat"><b>${union} / ${TOTAL}</b><span>全隊至少有一人解鎖</span></div>
-    <div class="stat bad"><b>${none.length}</b><span>全隊都沒有</span></div>
+    <div class="stat bad"><b>${none}</b><span>全隊都沒有</span></div>
     <div class="stat"><b>${full} / ${ps.length}</b><span>已收集完成的人</span></div>`;
   $('#teamPlayers').innerHTML = ps.map(p=>{ const k=CARDS.filter(c=>E(p,c.n)).length;
     return `<div class="prow"><span class="nm">${esc(p.name)}${p.id===S.me?'（我）':''}</span><div class="bar"><i style="width:${k/TOTAL*100}%"></i></div><span class="v">${k} / ${TOTAL}，缺 ${TOTAL-k}</span></div>`; }).join('') || '<div class="empty">還沒有玩家。</div>';
-  $('#teamMissing').innerHTML = none.length ? none.map(c=>`<button class="mini s-never" data-open="${c.n}">${art(c)}<small>#${c.n} ${esc(c.zh)}</small></button>`).join('')
-    : '<div class="empty" style="grid-column:1/-1">每張卡都至少有一個人解鎖了。</div>';
-  const needs = CARDS.map(c=>({c,miss:ps.filter(p=>!E(p,c.n)),has:ps.filter(p=>spareOf(p,c.n)>0)}))
-    .filter(x=>x.miss.length && x.miss.length<ps.length).sort((a,b)=>b.miss.length-a.miss.length||a.c.n-b.c.n);
-  $('#teamNeeds').innerHTML = needs.length ? needs.map(({c,miss,has})=>`<button class="nrow" data-open="${c.n}">${art(c)}<span>
-      <span class="t1">#${c.n} ${esc(c.zh)} <span class="rar">${dia(c.rar)}</span></span><br>
-      <span class="t2">還沒解鎖：${miss.map(p=>esc(p.name)).join('、')}</span><br>
-      <span class="t3 ${has.length?'':'none'}">${has.length?'可以送：'+has.map(p=>esc(p.name)+' ×'+C(p,c.n)).join('、'):'目前沒有人有多的'}</span></span></button>`).join('')
-    : '<div class="empty">目前沒有「部分人缺」的卡。</div>';
+  const f=S.t;
+  let rows=stats.filter(x=>{
+    const c=x.c;
+    if (f.q){ const q=f.q.replace(/^#/,''); if(!(c.zh.toLowerCase().includes(q)||c.en.toLowerCase().includes(q)||String(c.n).includes(q))) return false; }
+    if (f.rar.size && !f.rar.has(c.rar)) return false;
+    switch(f.st){
+      case 'none': return !x.ul;
+      case 'short': return x.miss.length>0;
+      case 'give': return x.miss.length>0 && x.spare.length>0;
+      case 'stuck': return x.miss.length>0 && x.ul>0 && !x.spare.length;
+      case 'done': return !x.miss.length;
+    }
+    return true;
+  });
+  if (f.sort==='miss') rows.sort((a,b)=>b.miss.length-a.miss.length||a.c.n-b.c.n);
+  if (f.sort==='few') rows.sort((a,b)=>a.total-b.total||a.c.n-b.c.n);
+  $('#tResult').textContent=`顯示 ${rows.length} 張`;
+  const mx=$('#mx');
+  if (!ps.length){ mx.innerHTML='<tbody><tr><td style="padding:24px">還沒有玩家。</td></tr></tbody>'; return; }
+  if (!rows.length){ mx.innerHTML='<tbody><tr><td style="padding:24px;white-space:normal">沒有符合條件的卡。試著清除搜尋或改選其他篩選條件。</td></tr></tbody>'; return; }
+  mx.innerHTML=`<thead><tr><th class="cc">卡片</th>${ps.map(p=>`<th class="${p.id===S.me?'me':''}">${esc(p.name)}</th>`).join('')}<th>全隊</th><th>解鎖</th><th>狀態</th></tr></thead><tbody>${
+    rows.map(x=>{ const c=x.c, [lbl,cls]=statusOf(x);
+      return `<tr><td class="cc"><button type="button" data-open="${c.n}" aria-label="查看 #${c.n} ${esc(c.zh)}">${art(c)}<span><b>#${c.n} ${esc(c.zh)}</b><small>${dia(c.rar)}</small></span></button></td>
+${ps.map(p=>{ const k=C(p,c.n); return !E(p,c.n)?'<td class="c-miss">缺</td>':k===0?'<td class="c-zero num">0</td>':`<td class="num${k>=2?' c-spare':''}">${k}</td>`; }).join('')}
+        <td class="num">${x.total}</td><td class="num">${x.ul}/${ps.length}</td><td class="${cls}">${lbl}</td></tr>`;
+    }).join('')}</tbody>`;
 }
 $('#tab-team').addEventListener('click',e=>{ const b=e.target.closest('[data-open]'); if(b) openCard(Number(b.dataset.open)); });
 
 /* ================= 交換建議 ================= */
-// 模擬器：在副本上推演，避免同一張多餘的卡被重複推薦
-function sim(ps){
-  const cnt=new Map(), ev=new Map(), K=(p,n)=>p.id+'|'+n;
-  for (const p of ps) for (const c of CARDS){ cnt.set(K(p,c.n),C(p,c.n)); ev.set(K(p,c.n),E(p,c.n)); }
-  return {
-    sp:(p,n)=>cnt.get(K(p,n))-(S.includeLast?0:1),
-    need:(p,n)=>!ev.get(K(p,n)),
-    move:(a,b,n)=>{ cnt.set(K(a,n),cnt.get(K(a,n))-1); cnt.set(K(b,n),cnt.get(K(b,n))+1); ev.set(K(b,n),true); },
-    scarce:n=>all().filter(p=>ev.get(K(p,n))).length
-  };
-}
 const RAR_ASC=[1,2,3], RAR_DESC=[3,2,1];
 const rarName = r => ['','一菱','二菱','三菱'][r];
-// 交換：只配「雙方都解鎖新卡」，低稀有度優先
+const byScarce = (a,b) => unlockers(a.n).length-unlockers(b.n).length || a.n-b.n;
+// 交換：依目前持有，兩兩配對「雙方都解鎖新卡」，低稀有度優先。
+// 不推演：同一張多的卡可能出現在和不同人的配對裡；同一對玩家之間則不重複使用同一張卡。
 function computeTrades(ps){
   if (ps.length<2) return [];
-  const s=sim(all()), out=[];
+  const out=[];
   for (const r of RAR_ASC){
     const pool=CARDS.filter(c=>c.rar===r);
     for (let i=0;i<ps.length;i++) for (let j=i+1;j<ps.length;j++){
       const A=ps[i], B=ps[j];
-      for(;;){
-        const by=(a,b)=>s.scarce(a.n)-s.scarce(b.n)||a.n-b.n;
-        const X=pool.filter(c=>s.sp(A,c.n)>0&&s.need(B,c.n)).sort(by);
-        const Y=pool.filter(c=>s.sp(B,c.n)>0&&s.need(A,c.n)).sort(by);
-        if (!X.length||!Y.length) break;
-        s.move(A,B,X[0].n); s.move(B,A,Y[0].n);
-        out.push({a:A.id,b:B.id,x:X[0].n,y:Y[0].n,r});
-      }
+      const X=pool.filter(c=>spareOf(A,c.n)>0&&!E(B,c.n)).sort(byScarce);
+      const Y=pool.filter(c=>spareOf(B,c.n)>0&&!E(A,c.n)).sort(byScarce);
+      for (let k=0;k<Math.min(X.length,Y.length);k++) out.push({a:A.id,b:B.id,x:X[k].n,y:Y[k].n,r});
     }
   }
   return out;
 }
-// 贈送：高稀有度優先，同稀有度先處理解鎖人數最少的卡；由多餘張數最多的人送
+// 贈送：依目前持有，列出每張「有人缺、也有人多」的卡，高稀有度優先，同稀有度先列解鎖人數少的
 function computeGifts(){
   const ps=all(); if (ps.length<2) return [];
-  const s=sim(ps), out=[];
-  const order=CARDS.slice().sort((a,b)=>b.rar-a.rar||s.scarce(a.n)-s.scarce(b.n)||a.n-b.n);
-  for (const c of order) for (const B of ps){
-    if (!s.need(B,c.n)) continue;
-    const givers=ps.filter(p=>p!==B&&s.sp(p,c.n)>0).sort((a,b)=>s.sp(b,c.n)-s.sp(a,c.n));
-    if (!givers.length) continue;
-    s.move(givers[0],B,c.n);
-    out.push({a:givers[0].id,b:B.id,x:c.n,r:c.rar});
-  }
-  return out;
+  return CARDS.slice().sort((a,b)=>b.rar-a.rar||byScarce(a,b))
+    .map(c=>({c, r:c.rar, miss:ps.filter(p=>!E(p,c.n)), givers:ps.filter(p=>spareOf(p,c.n)>0).sort((a,b)=>C(b,c.n)-C(a,c.n))}))
+    .filter(x=>x.miss.length && x.givers.length);
 }
 function leg(from,to,n,extra=''){
   const c=BYN.get(n);
@@ -914,7 +966,7 @@ const persp = () => me() || viewP();
 function fillWho(sel,val,first,exclude){
   const os=all().filter(p=>p!==exclude);
   sel.innerHTML=`<option value="">${first}</option>`+os.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.id===S.me?'（我）':''}</option>`).join('');
-  if (!os.some(p=>p.id===val)) val='';
+  if (S.loaded && !os.some(p=>p.id===val)) val='';
   sel.value=val; return val;
 }
 function rhead(r,extra=''){ return `<div class="rhead"><h2>${rarName(r)}</h2><span class="rar">${dia(r)}</span>${extra}</div>`; }
@@ -922,7 +974,7 @@ function rhead(r,extra=''){ return `<div class="rhead"><h2>${rarName(r)}</h2><sp
 /* ---------- 交換建議 ---------- */
 function renderTrade(){
   const box=$('#sugList'), P=persp();
-  S.trWho = fillWho($('#trWho'), S.trWho, '全隊（自動配對）', P);
+  S.trWho = fillWho($('#trWho'), S.trWho, '全隊', P);
   $('#trMineWrap').hidden = !!S.trWho || !S.me;
   if (all().length<2){ box.innerHTML='<div class="empty">至少要有兩位玩家登記，才能產生交換建議。</div>'; return; }
   if (S.trWho) return renderPair(box,P,S.players.get(S.trWho));
@@ -944,7 +996,7 @@ function pickList(owner,other,cards,side,can){
 function renderPair(box,P,X){
   if (!P){ box.innerHTML='<div class="empty">請先登入。</div>'; return; }
   const can = P.id===S.me;
-  const auto=computeTrades([P,X]).filter(s=>true);
+  const auto=computeTrades([P,X]);
   S.sugs=auto;
   let html = `<p class="lead" style="margin-top:0">${esc(P.name)} 和 ${esc(X.name)} 之間可以交換的卡。${can?'點任一張卡會開啟交換視窗，可以自由搭配同稀有度的卡。':'登入本人帳號後才能記錄交換。'}</p>`;
   if (auto.length) html += `<div class="rhead"><h2>建議配對</h2><small>${auto.length} 組，雙方都解鎖新卡</small></div>`+auto.map((s,i)=>`<div class="sug"><span class="kind">${rarName(s.r)}</span>${leg(s.a,s.b,s.x)}${leg(s.b,s.a,s.y)}${can?`<button class="btn" data-sug="${i}">照這個配對記錄交換（可修改）</button>`:''}</div>`).join('');
@@ -965,23 +1017,28 @@ $('#sugList').addEventListener('click',e=>{
   if (s.a===S.me) openTx({mode:'trade',to:s.b,give:s.x,get:s.y});
   else openTx({mode:'trade',to:s.a,give:s.y,get:s.x});
 });
-$('#trWho').addEventListener('change',e=>{ S.trWho=e.target.value; renderTrade(); });
-$('#optMine').addEventListener('change',e=>{ S.mineOnly=e.target.checked; renderTrade(); });
+$('#trWho').addEventListener('change',e=>{ S.trWho=e.target.value; lsSet('b4b-trwho',S.trWho); renderTrade(); });
+$('#optMine').addEventListener('change',e=>{ S.mineOnly=e.target.checked; lsSet('b4b-trmine',S.mineOnly?'1':'0'); renderTrade(); });
 
 /* ---------- 贈送建議 ---------- */
 function renderGift(){
   const box=$('#giftList');
-  S.gfWho = fillWho($('#gfWho'), S.gfWho, '全隊（自動分配）', null);
+  S.gfWho = fillWho($('#gfWho'), S.gfWho, '全隊', null);
   $('#gfMineWrap').hidden = !!S.gfWho || !S.me;
   if (all().length<2){ box.innerHTML='<div class="empty">至少要有兩位玩家登記，才能產生贈送建議。</div>'; return; }
   if (S.gfWho) return renderNeeds(box,S.players.get(S.gfWho));
-  const list=computeGifts();
-  S.gifts = list.filter(g=>!S.gfMine||!S.me||g.a===S.me);
-  if (!S.gifts.length){ box.innerHTML=`<div class="empty">${list.length?'目前沒有你能送的卡。取消勾選「只看我能送的」可以看全隊的分配。':'目前沒有可以贈送的卡：還沒解鎖的卡，其他人也都沒有多的。'}</div>`; return; }
+  const list=computeGifts(), m=me();
+  const mine=x=>x.givers.includes(m);
+  const shown=list.filter(x=>!S.gfMine||!m||mine(x));
+  if (!shown.length){ box.innerHTML=`<div class="empty">${list.length?'目前沒有你能送的卡。取消勾選「只看我能送的」可以看全隊的狀況。':'目前沒有可以贈送的卡：還沒解鎖的卡，其他人也都沒有多的。'}</div>`; return; }
   box.innerHTML = RAR_DESC.map(r=>{
-    const g=S.gifts.map((x,i)=>[x,i]).filter(([x])=>x.r===r); if(!g.length) return '';
-    return rhead(r,`<small>${g.length} 筆</small>`)+g.map(([x,i])=>`<div class="sug help">${leg(x.a,x.b,x.x,`（${esc(pname(x.b))}新解鎖）`)}${
-      x.a===S.me?`<button class="btn" data-gift="${i}">已在遊戲中送出，記錄贈送</button>`:`<span class="wait">由${esc(pname(x.a))}記錄。</span>`}</div>`).join('');
+    const g=shown.filter(x=>x.r===r); if(!g.length) return '';
+    return rhead(r,`<small>${g.length} 張</small>`)+g.map(x=>`<div class="giftrow">${art(x.c)}<div>
+      <div class="t1">#${x.c.n} ${esc(x.c.zh)} <span class="rar">${dia(x.c.rar)}</span></div>
+      <div class="miss">還沒解鎖：${x.miss.map(p=>esc(p.name)+(p===m?'（我）':'')).join('、')}</div>
+      <div class="has">可以送：${x.givers.map(p=>esc(p.name)+(p===m?'（我）':'')+' ×'+C(p,x.c.n)).join('、')}</div>
+      ${m&&mine(x)?`<div class="acts">${x.miss.map(p=>`<button class="btn small" data-gto="${esc(p.id)}" data-gn="${x.c.n}">送給${esc(p.name)}</button>`).join('')}</div>`:''}
+    </div></div>`).join('');
   }).join('');
 }
 function renderNeeds(box,X){
@@ -1003,13 +1060,13 @@ function renderNeeds(box,X){
   box.innerHTML=html;
 }
 $('#giftList').addEventListener('click',e=>{
-  const g=e.target.closest('[data-gift]'); if (g){ const x=S.gifts[Number(g.dataset.gift)]; if(x) openTx({mode:'gift',to:x.b,give:x.x}); return; }
+  const g=e.target.closest('[data-gto]'); if (g){ openTx({mode:'gift',to:g.dataset.gto,give:Number(g.dataset.gn)}); return; }
   const n=e.target.closest('[data-need]'); if (n) openTx({mode:'gift',to:S.gfWho,give:Number(n.dataset.need)});
 });
-$('#gfWho').addEventListener('change',e=>{ S.gfWho=e.target.value; renderGift(); });
-$('#gfMine').addEventListener('change',e=>{ S.gfMine=e.target.checked; renderGift(); });
+$('#gfWho').addEventListener('change',e=>{ S.gfWho=e.target.value; lsSet('b4b-gfwho',S.gfWho); renderGift(); });
+$('#gfMine').addEventListener('change',e=>{ S.gfMine=e.target.checked; lsSet('b4b-gfmine',S.gfMine?'1':'0'); renderGift(); });
 document.querySelectorAll('.optLast').forEach(cb=>cb.addEventListener('change',e=>{
-  S.includeLast=e.target.checked; document.querySelectorAll('.optLast').forEach(x=>x.checked=S.includeLast); refresh();
+  S.includeLast=e.target.checked; lsSet('b4b-last',S.includeLast?'1':'0'); document.querySelectorAll('.optLast').forEach(x=>x.checked=S.includeLast); refresh();
 }));
 $('#colSeg').addEventListener('click',e=>{ const b=e.target.closest('[data-cols]'); if(!b) return; S.cols=b.dataset.cols; lsSet('b4b-cols',S.cols); renderGrid(); });
 
@@ -1216,7 +1273,9 @@ function refresh(){
 function banner(html,err){ $('#bannerWrap').innerHTML=`<div class="banner${err?' err':''}">${html}</div>`; }
 
 /* ================= 啟動 ================= */
-initFilters(); initTiles();
+initFilters(); initTiles(); initTeamFilters();
+document.querySelectorAll('.optLast').forEach(x=>x.checked=S.includeLast);
+$('#optMine').checked=S.mineOnly; $('#gfMine').checked=S.gfMine;
 let store=null;
 if (FIREBASE_CONFIG){
   try { store = await makeFirebaseStore(FIREBASE_CONFIG); }
