@@ -169,6 +169,7 @@ h2{font:400 20px/1.3 var(--round);margin:22px 0 8px}
 .pick .art{border-radius:3px}.pick .ph *{display:none}
 .pick .need{font-size:11px;font-weight:700;color:#fff;background:var(--ok);border-radius:4px;padding:2px 5px}
 .pick .empty{padding:14px;font-size:13px}
+.orig{font-size:11px;font-weight:700;color:var(--violet);border:1px solid var(--violet);border-radius:4px;padding:1px 5px;margin-left:4px;white-space:nowrap}
 .txsum{background:var(--paper);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:10px}
 
 /* dialogs */
@@ -360,6 +361,14 @@ table.who-has{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px
 </main>
 
 <dialog id="cardDlg"><div class="dlg" id="cardBody"></div></dialog>
+<dialog id="accDlg"><div class="dlg">
+  <div class="dlg-head"><h3>確認交換</h3><button class="x" type="button" data-close aria-label="關閉">✕</button></div>
+  <div class="txf"><b>對方送給你的卡（不能更改）</b><div id="accFixed"></div></div>
+  <div class="txf"><b>你送出的卡（可以更改，需和對方的卡同稀有度）</b><input id="accQ" type="search" placeholder="搜尋名稱或編號" autocomplete="off"><div class="pick" id="accPick"></div></div>
+  <div class="txsum" id="accSum"></div>
+  <button class="btn" id="accGo" type="button" style="width:100%">確認，遊戲裡已經換好了</button>
+  <p class="hint">請選你在遊戲中實際送出的那張。對方送你的卡不會改變。</p>
+</div></dialog>
 <dialog id="txDlg"><div class="dlg">
   <div class="dlg-head"><h3>記錄贈送／交換</h3><button class="x" type="button" data-close aria-label="關閉">✕</button></div>
   <div class="seg" role="group"><button type="button" data-mode="gift">贈送</button><button type="button" data-mode="trade">交換</button></div>
@@ -543,9 +552,12 @@ function makeDemoStore(){
       const id=uid('t'); const giveLog=this._move(from,to,give,{kind:'trade',tradeId:id});
       db.trades.push({id,from,to,give,get,status:'pending',at:Date.now(),fromName:a.name,toName:b.name,giveLog}); save();
     },
-    async acceptTrade(id){
+    async acceptTrade(id,get){
       const t=db.trades.find(x=>x.id===id); if(!t||t.status!=='pending') throw new Error('TRADE_GONE');
-      t.acceptLog=this._move(t.to,t.from,t.get,{kind:'trade',tradeId:id}); t.status='done'; t.doneAt=Date.now(); save();
+      const send = get ?? t.get;
+      t.acceptLog=this._move(t.to,t.from,send,{kind:'trade',tradeId:id});
+      if (send!==t.get){ t.getOrig=t.get; t.get=send; }
+      t.status='done'; t.doneAt=Date.now(); save();
     },
     async rejectTrade(id){ const t=db.trades.find(x=>x.id===id); if(t&&t.status==='pending'){ t.status='rejected'; t.doneAt=Date.now(); save(); } },
     async cancelTrade(id){
@@ -645,13 +657,16 @@ async function makeFirebaseStore(cfg){
         tx.set(tr,{from,to,give,get,status:'pending',at:serverTimestamp(),fromName:a.name,toName:b.name,giveLog});
       });
     },
-    acceptTrade(id){
+    acceptTrade(id,get){
       const tr=doc(db,'trades',id);
       return runTransaction(db, async tx => {
         const t=(await tx.get(tr)).data(); if (!t || t.status!=='pending') throw new Error('TRADE_GONE');
+        const send = get ?? t.get;
         const [b,a]=await readPair(tx,t.to,t.from);
-        const acceptLog=writeMove(tx,t.to,t.from,b,a,t.get,{kind:'trade',tradeId:id});
-        tx.update(tr,{status:'done',acceptLog,doneAt:serverTimestamp()});
+        const acceptLog=writeMove(tx,t.to,t.from,b,a,send,{kind:'trade',tradeId:id});
+        const u={status:'done',acceptLog,doneAt:serverTimestamp()};
+        if (send!==t.get){ u.get=send; u.getOrig=t.get; }   // 被交易方改了自己送出的卡
+        tx.update(tr,u);
       });
     },
     rejectTrade:(id) => updateDoc(doc(db,'trades',id),{status:'rejected',doneAt:serverTimestamp()}),
@@ -681,7 +696,7 @@ function onLogs(list){ S.logs=list; if (S.tab==='log') renderLog(); }
 let notified=false;
 function onTrades(list){
   S.trades=list; renderBadge(); if (S.tab==='log') renderLog();
-  if (S.me && !notified){ notified=true; const k=myIncoming().length; if(k) toast(`你有 ${k} 筆交換等待確認，請到「贈送交換紀錄」查看`); }
+  if (S.me && !notified){ notified=true; const k=myIncoming().length; if(k) toast(`你有 ${k} 筆交換等待確認，請到「紀錄」分頁查看`); }
 }
 const myIncoming = () => S.trades.filter(t=>t.status==='pending' && t.to===S.me);
 function renderBadge(){ const k=S.me?myIncoming().length:0, b=$('#logBadge'); b.hidden=!k; b.textContent=k; }
@@ -1086,7 +1101,7 @@ function renderTrq(){
     if (t.status==='rejected') return `<div class="trq rej"><span class="st">${fmt.format(tdate(t.at))}　${esc(tn)} 拒絕了這筆交換。你送出的那張已經先記錄，請按取消把張數改回去。</span>${body}
       <div class="row"><button class="btn" data-tcancel="${esc(t.id)}">取消並復原我送出的卡</button></div></div>`;
     if (t.to===S.me) return `<div class="trq"><span class="st">${fmt.format(tdate(t.at))}　${esc(fn)} 記錄了一筆和你的交換，請確認：</span>${body}
-      <div class="row"><button class="btn" data-taccept="${esc(t.id)}">確認，遊戲裡已經換好了</button><button class="btn ghost" data-treject="${esc(t.id)}">拒絕</button></div></div>`;
+      <div class="row"><button class="btn" data-taccept="${esc(t.id)}">確認，遊戲裡已經換好了</button><button class="btn ghost" data-tswap="${esc(t.id)}">更換我送出的卡</button><button class="btn ghost" data-treject="${esc(t.id)}">拒絕</button></div></div>`;
     if (t.from===S.me) return `<div class="trq wait"><span class="st">${fmt.format(tdate(t.at))}　等待 ${esc(tn)} 確認。對方確認前，只有你送出的那張已更新。</span>${body}
       <div class="row"><button class="btn ghost" data-tcancel="${esc(t.id)}">取消這筆交換</button></div></div>`;
     return `<div class="trq wait"><span class="st">${fmt.format(tdate(t.at))}　等待 ${esc(tn)} 確認</span>${body}</div>`;
@@ -1110,16 +1125,19 @@ function renderLog(){
   box.innerHTML = logs.map(l=>{
     const t = tdate(l.at); const c=BYN.get(l.card), k=l.kind||'gift';
     const fn = S.players.get(l.from)?.name ?? l.fromName, tn = S.players.get(l.to)?.name ?? l.toName;
+    const tr0 = l.kind==='trade' ? S.trades.find(x=>x.id===l.tradeId) : null;
+    const changed = tr0 && tr0.getOrig!=null && tr0.acceptLog===l.id ? `（原本是 #${tr0.getOrig} ${esc(BYN.get(tr0.getOrig)?.zh)}，已更改）` : '';
     const can = !l.undone && l.from===S.me && !(l.kind==='trade' && S.trades.some(x=>x.id===l.tradeId && ['pending','rejected'].includes(x.status)));
     return `<div class="lrow ${l.undone?'undone':''}"><span class="tm">${fmt.format(t)}</span>
       <span class="kb ${k}">${k==='trade'?'交換':'贈送'}</span>
-      <span class="tx">${esc(fn)} → ${esc(tn)}：#${l.card} ${esc(c?.zh)}${l.newUnlock?'（新解鎖）':''}${l.undone?'（已復原）':''}</span>
+      <span class="tx">${esc(fn)} → ${esc(tn)}：#${l.card} ${esc(c?.zh)}${l.newUnlock?'（新解鎖）':''}${changed}${l.undone?'（已復原）':''}</span>
       ${can?`<button class="btn small ghost" data-undo="${esc(l.id)}">復原</button>`:''}</div>`;
   }).join('');
 }
 $('#logFilter').addEventListener('click',e=>{ const b=e.target.closest('[data-lf]'); if(!b) return; S.logF=b.dataset.lf; renderLog(); });
 $('#newTxBtn').addEventListener('click',()=>openTx({mode:'gift'}));
 $('#trqList').addEventListener('click',async e=>{
+  const sw=e.target.closest('[data-tswap]'); if (sw) return openAcc(sw.dataset.tswap);
   const a=e.target.closest('[data-taccept]'), r=e.target.closest('[data-treject]'), c=e.target.closest('[data-tcancel]');
   const b=a||r||c; if(!b) return;
   if (r && !confirm('拒絕這筆交換？對方需要再取消，才會把他送出的卡改回去。')) return;
@@ -1137,6 +1155,40 @@ $('#logList').addEventListener('click',async e=>{
   if (!confirm('復原這筆紀錄？雙方張數會改回去。')) return;
   b.disabled=true; try { await flush(); await store.undo(b.dataset.undo); toast('已復原'); } catch(err){ toast(errMsg(err)); b.disabled=false; }
 });
+
+/* ================= 確認交換時更換自己送出的卡 ================= */
+const ACC={id:null,pick:null};
+function openAcc(id){
+  const t=S.trades.find(x=>x.id===id); if (!t || t.status!=='pending' || t.to!==S.me) return toast('這筆交換已經被處理過了。');
+  ACC.id=id; ACC.pick = C(me(),t.get)>0 ? t.get : null; $('#accQ').value='';
+  renderAcc(); const d=$('#accDlg'); if(!d.open) d.showModal();
+}
+function renderAcc(){
+  const t=S.trades.find(x=>x.id===ACC.id), m=me();
+  if (!t || t.status!=='pending'){ $('#accDlg').close(); return; }
+  const P=S.players.get(t.from), r=BYN.get(t.give).rar;
+  $('#accFixed').innerHTML=`<div class="leg">${art(BYN.get(t.give))}<span><b>${esc(pname(t.from))}</b> 給你：${cardTxt(t.give)}</span></div>`;
+  const list=CARDS.filter(c=>c.rar===r && C(m,c.n)>0 && qMatch(c,$('#accQ').value))
+    .sort((a,b)=>(b.n===t.get)-(a.n===t.get)||(P?E(P,a.n)-E(P,b.n):0)||a.n-b.n);
+  $('#accPick').innerHTML = list.length ? list.map(c=>`<button type="button" data-n="${c.n}" aria-pressed="${c.n===ACC.pick}">${art(c)}
+    <span>#${c.n} ${esc(c.zh)}${c.n===t.get?'<span class="orig">原本選的</span>':''}<br><small style="color:var(--muted)">你有 ${C(m,c.n)} 張</small></span>
+    ${P&&!E(P,c.n)?`<span class="need">${esc(P.name)}未解鎖</span>`:''}</button>`).join('') : '<div class="empty">你沒有同稀有度的卡可以送出</div>';
+  const ok=ACC.pick!=null;
+  $('#accSum').innerHTML = !ok ? '選擇你在遊戲中實際送出的卡。' :
+    `${esc(pname(t.from))} 給你 ${cardTxt(t.give)}<br>你給 ${esc(pname(t.from))} ${cardTxt(ACC.pick)}${ACC.pick!==t.get?`<br><span style="color:var(--violet)">已更改：原本是 #${t.get} ${esc(BYN.get(t.get).zh)}</span>`:''}`;
+  $('#accGo').disabled=!ok;
+}
+$('#accDlg').addEventListener('click',async e=>{
+  const d=$('#accDlg');
+  if (outside(e,d) || e.target.closest('[data-close]')) return d.close();
+  const pk=e.target.closest('#accPick [data-n]'); if (pk){ ACC.pick=Number(pk.dataset.n); return renderAcc(); }
+  if (e.target.closest('#accGo')){
+    const b=$('#accGo'); b.disabled=true;
+    try { await flush(); await store.acceptTrade(ACC.id,ACC.pick); d.close(); toast('已確認，雙方張數都更新了'); }
+    catch(err){ toast(errMsg(err)); b.disabled=false; }
+  }
+});
+$('#accQ').addEventListener('input',renderAcc);
 
 /* ================= 自選贈送／交換 ================= */
 const TX={mode:'gift',to:null,give:null,get:null};
@@ -1179,7 +1231,7 @@ function renderTx(){
     : `你送給 <b>${esc(o.name)}</b> ${cardTxt(TX.give)}${!E(o,TX.give)?'（對方新解鎖）':''}`;
   $('#txGo').disabled=!ok;
   $('#txGo').textContent = trade ? '送出交換紀錄，等待對方確認' : '確認記錄贈送';
-  $('#txHint').textContent = trade ? '你送出的卡會立刻更新；對方在「贈送交換紀錄」按確認後，他送你的卡才會更新。對方確認前你可以取消。' : '對方的張數會自動 +1，不用另外登記。';
+  $('#txHint').textContent = trade ? '你送出的卡會立刻更新；對方在「紀錄」分頁按確認後，他送你的卡才會更新。對方確認前你可以取消。' : '對方的張數會自動 +1，不用另外登記。';
 }
 $('#txDlg').addEventListener('click',async e=>{
   const d=$('#txDlg');
