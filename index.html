@@ -88,7 +88,9 @@ h2{font:400 20px/1.3 var(--round);margin:22px 0 8px}
 @media (prefers-reduced-motion:reduce){.s-own .art.sweep::after{animation:none}}
 .s-never .art img,.s-never .ph{filter:grayscale(1);opacity:.38}
 .s-never .art{outline:2px dashed var(--missing);outline-offset:-2px;background:#ddd}
-.s-zero .art img,.s-zero .ph{opacity:.6}
+/* 已解鎖但 0 張：中性淺灰底，卡圖保留原色但變淡，不讓屬性色透出來 */
+.s-zero .art{background:#E9E8EF}
+.s-zero .art img,.s-zero .ph{opacity:.55}
 .tag{position:absolute;z-index:2;font-size:11px;line-height:1;padding:4px 6px;border-radius:5px;font-weight:700}
 .tag.never{top:6px;left:6px;background:var(--missing);color:#fff}
 .tag.zero{top:6px;left:6px;background:rgba(255,255,255,.92);color:var(--ink)}
@@ -137,6 +139,8 @@ h2{font:400 20px/1.3 var(--round);margin:22px 0 8px}
 .leg{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;font-size:14px}
 .leg .art{border-radius:4px}
 .leg .note{color:var(--muted)}
+.cinfo{display:block;font-size:12px;line-height:1.5;margin-top:2px;color:var(--muted)}
+.cinfo .h,.cinfo .m{display:block}.cinfo .h{color:var(--ok)}.cinfo .m{color:var(--missing)}
 .btn{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:9px 14px;font-weight:500}
 .btn.ghost{background:var(--sleeve);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 .btn.small{padding:5px 10px;font-size:13px;border-radius:8px}
@@ -973,6 +977,15 @@ function computeGifts(){
     .map(c=>({c, r:c.rar, miss:ps.filter(p=>!E(p,c.n)), givers:ps.filter(p=>spareOf(p,c.n)>0).sort((a,b)=>C(b,c.n)-C(a,c.n))}))
     .filter(x=>x.miss.length && x.givers.length);
 }
+function cardInfo(n){
+  const ps=all(), has=ps.filter(p=>C(p,n)>0).sort((a,b)=>C(b,n)-C(a,n)), miss=ps.filter(p=>!E(p,n));
+  const nm=p=>esc(p.name)+(p.id===S.me?'（我）':'');
+  return `<span class="cinfo"><span class="h">持有：${has.length?has.map(p=>nm(p)+' ×'+C(p,n)).join('、'):'沒有人'}</span><span class="m">${miss.length?`未解鎖 ${miss.length} 人：${miss.map(nm).join('、')}`:'全員已解鎖'}</span></span>`;
+}
+function legInfo(from,to,n){
+  const c=BYN.get(n);
+  return `<div class="leg">${art(c)}<span><b>${esc(pname(from))}</b> 給 <b>${esc(pname(to))}</b>：#${c.n} ${esc(c.zh)} <span class="rar">${dia(c.rar)}</span>${cardInfo(n)}</span></div>`;
+}
 function leg(from,to,n,extra=''){
   const c=BYN.get(n);
   return `<div class="leg">${art(c)}<span><b>${esc(pname(from))}</b> 給 <b>${esc(pname(to))}</b>：#${c.n} ${esc(c.zh)} <span class="rar">${dia(c.rar)}</span>${extra}</span></div>`;
@@ -998,14 +1011,14 @@ function renderTrade(){
   if (!S.sugs.length){ box.innerHTML=`<div class="empty">${list.length?'目前沒有跟你有關的建議。取消勾選「只看跟我有關的」可以看全隊的配對，或在「對象」選一個人看所有可換的卡。':'目前沒有雙方都能解鎖的交換。可以在「對象」選一個人看所有可換的卡，或到「贈送建議」看看。'}</div>`; return; }
   box.innerHTML = RAR_ASC.map(r=>{
     const g=S.sugs.map((s,i)=>[s,i]).filter(([s])=>s.r===r); if(!g.length) return '';
-    return rhead(r,`<small>${g.length} 組</small>`)+g.map(([s,i])=>`<div class="sug"><span class="kind">雙方都解鎖新卡</span>${leg(s.a,s.b,s.x)}${leg(s.b,s.a,s.y)}${
+    return rhead(r,`<small>${g.length} 組</small>`)+g.map(([s,i])=>`<div class="sug"><span class="kind">雙方都解鎖新卡</span>${legInfo(s.a,s.b,s.x)}${legInfo(s.b,s.a,s.y)}${
       (s.a===S.me||s.b===S.me)?`<button class="btn" data-sug="${i}">照這個建議記錄交換（可修改）</button>`:`<span class="wait">由${esc(pname(s.a))}或${esc(pname(s.b))}發起記錄。</span>`}</div>`).join('');
   }).join('');
 }
 function pickList(owner,other,cards,side,can){
   if (!cards.length) return '<div class="empty" style="padding:12px;font-size:13px">沒有</div>';
   return `<div class="pick free">${cards.map(c=>`<button type="button" data-pv="${side}" data-n="${c.n}" ${can?'':'disabled'}>${art(c)}
-    <span>#${c.n} ${esc(c.zh)}<br><small style="color:var(--muted)">${esc(owner.name)}有 ${C(owner,c.n)} 張</small></span>
+    <span>#${c.n} ${esc(c.zh)}${cardInfo(c.n)}</span>
     ${!E(other,c.n)?`<span class="need">${esc(other.name)}未解鎖</span>`:''}</button>`).join('')}</div>`;
 }
 function renderPair(box,P,X){
@@ -1014,7 +1027,7 @@ function renderPair(box,P,X){
   const auto=computeTrades([P,X]);
   S.sugs=auto;
   let html = `<p class="lead" style="margin-top:0">${esc(P.name)} 和 ${esc(X.name)} 之間可以交換的卡。${can?'點任一張卡會開啟交換視窗，可以自由搭配同稀有度的卡。':'登入本人帳號後才能記錄交換。'}</p>`;
-  if (auto.length) html += `<div class="rhead"><h2>建議配對</h2><small>${auto.length} 組，雙方都解鎖新卡</small></div>`+auto.map((s,i)=>`<div class="sug"><span class="kind">${rarName(s.r)}</span>${leg(s.a,s.b,s.x)}${leg(s.b,s.a,s.y)}${can?`<button class="btn" data-sug="${i}">照這個配對記錄交換（可修改）</button>`:''}</div>`).join('');
+  if (auto.length) html += `<div class="rhead"><h2>建議配對</h2><small>${auto.length} 組，雙方都解鎖新卡</small></div>`+auto.map((s,i)=>`<div class="sug"><span class="kind">${rarName(s.r)}</span>${legInfo(s.a,s.b,s.x)}${legInfo(s.b,s.a,s.y)}${can?`<button class="btn" data-sug="${i}">照這個配對記錄交換（可修改）</button>`:''}</div>`).join('');
   for (const r of RAR_ASC){
     const give=CARDS.filter(c=>c.rar===r&&spareOf(P,c.n)>0).sort((a,b)=>E(X,a.n)-E(X,b.n)||a.n-b.n);
     const get=CARDS.filter(c=>c.rar===r&&spareOf(X,c.n)>0).sort((a,b)=>E(P,a.n)-E(P,b.n)||a.n-b.n);
